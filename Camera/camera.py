@@ -9,6 +9,10 @@ class Cam:
         while True:
             ret, frame = self.cap.read()
 
+            if not ret:
+                print('No Camera Module Detected')
+                break
+
             cv.imshow('Stream', frame)
             k = cv.waitKey(5) & 0xFF
             if k == 27:
