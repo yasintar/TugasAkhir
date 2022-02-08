@@ -3,21 +3,13 @@ import cv2 as cv
 class Cam:
     def __init__(self) -> None:
         self.cap = cv.VideoCapture(0)
-        self.run()
+        self.frame = None
 
-    def run(self):
-        while True:
-            ret, frame = self.cap.read()
-
-            if not ret:
-                print('No Camera Module Detected')
-                break
-
-            cv.imshow('Stream', frame)
-            k = cv.waitKey(5) & 0xFF
-            if k == 27:
-                break
-        self.stop()
+    def start(self):
+        ret, self.frame = self.cap.read()
+        if not ret:
+            print('Camera Module not Connected')
+        cv.imshow('Stream', self.frame)
 
     def stop(self):
         self.cap.release()
