@@ -1,5 +1,6 @@
 from camera import Cam
 import cv2 as cv
+import threading
 
 class Main:
     def __init__(self) -> None:
@@ -7,10 +8,12 @@ class Main:
         self.run()
 
     def run(self):
+        tStop = threading.Event()
+        self.camera.capture(tStop)
         while True:
-            self.camera.start()
+            # print(threading.enumerate())
 
-            self.camera.capture()
+            self.camera.start()
 
             k = cv.waitKey(5) & 0xFF
             if k == 27:

@@ -1,11 +1,13 @@
 from logging import exception
 import cv2 as cv
 from datetime import datetime
+import threading
 
 class Cam:
     def __init__(self) -> None:
         self.cap = cv.VideoCapture(0)
         self.frame = None
+
 
     def start(self):
         ret, self.frame = self.cap.read()
@@ -17,7 +19,12 @@ class Cam:
         self.cap.release()
         cv.destroyAllWindows()
 
-    def capture(self):
+    def capture(self, tStop):
+        self.captureThread()
+        if not tStop.is_set():
+            threading.Timer(10, self.capture, [tStop]).start()
+
+    def captureThread(self):
         print("Capture")
         now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
         name = "./images/{}.png".format(now)
