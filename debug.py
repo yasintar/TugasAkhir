@@ -1,9 +1,3 @@
-import time 
+from dsocket import dataReceiver
 
-starttime=time.time() 
-
-while True: 
-
-    print("tick") 
-
-    time.sleep(60.0 - ((time.time() - starttime) % 60.0))
+receiver = dataReceiver()

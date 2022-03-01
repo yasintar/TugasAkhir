@@ -20,7 +20,8 @@ class dataSender:
         sys.exit(0)
 
     def send_data(self, receiver, filename):
-        data = Data(self.client.getsockname(), receiver, filename)
+        data = Data(self.client.getsockname(), receiver, 
+                    filename, os.path.getsize("images/"+filename))
         data = pickle.dumps(data)
         self.client.send(data)
 
@@ -41,5 +42,11 @@ class dataReceiver:
         self.connection, self.sender_address = self.server.accept()
         print("Connected to -> {}".format(self.sender_address))
         while True:
-            data = self.connection.recv(32)
+            res = b''
+            while True:
+                recv_data = self.connection.recv(1024)
+                res += recv_data
+                if len(recv_data)<1024-1:
+                    break
+            data = 
             
