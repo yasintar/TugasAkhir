@@ -19,11 +19,17 @@ class dataSender:
         self.client.close()
         sys.exit(0)
 
-    def send_data(self, receiver, filename):
-        data = Data(self.client.getsockname(), receiver, 
-                    filename, os.path.getsize("images/"+filename))
-        data = pickle.dumps(data)
-        self.client.send(data)
+    def send_data(self, receiver, filename, file):
+        try:
+            with open("images/"+filename, 'rb') as file:
+                filesize = str(os.path.getsize("images/"+filename))
+                readfile = file.read()
+                data = Data(self.client.getsockname(), receiver, 
+                        readfile, filename, filesize)
+                self.client.sendall(pickle.dumps(data))
+        except OSError:
+            print("Error sending image")
+            pass
 
 class dataReceiver:
     def __init__(self, address='127.0.0.1', port='5000') -> None:
@@ -37,6 +43,9 @@ class dataReceiver:
         self.server.bind((self.host, self.port))
         self.server.listen(5)
 
+    def close_socket(self):
+        self.server.close()
+
     def run(self):
         self.open_socket()
         self.connection, self.sender_address = self.server.accept()
@@ -48,5 +57,8 @@ class dataReceiver:
                 res += recv_data
                 if len(recv_data)<1024-1:
                     break
-            data = 
-            
+            data = pickle.loads(res)
+
+            if data.filename is not None:
+                with open(data.filename, 'wb') as file:
+                    file.write(data.file)
