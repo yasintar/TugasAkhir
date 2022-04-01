@@ -1,7 +1,5 @@
 class Data:
-    def __init__(self, sender, receiver, dfile, filename=None, filesize=65536):
-        self.sender = sender
-        self.receiver = receiver
+    def __init__(self, bfile, filesize, filename=None):
         self.filename = filename
-        self.file = dfile
+        self.file = bfile
         self.filesize = filesize

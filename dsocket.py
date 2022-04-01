@@ -2,63 +2,79 @@ import socket
 import os
 import sys
 from data import Data
-import threading
+import constant
 import pickle
 
-class dataSender:
-    def __init__(self, address='127.0.0.1', port='5000') -> None:
+class Server:
+    def __init__(self, address='127.0.0.1', port=5000) -> None:
         self.address = address
         self.port = port
-        self.client = None
+        self.sock = None
 
-    def open_socket(self):
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect((self.host, self.port))
-    
-    def close_socket(self):
-        self.client.close()
-        sys.exit(0)
+    def start_server(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind((self.address, self.port))
+        self.sock.listen(5)
+        print("Server starts ...")
 
-    def send_data(self, receiver, filename, file):
-        try:
-            with open("images/"+filename, 'rb') as file:
-                filesize = str(os.path.getsize("images/"+filename))
-                readfile = file.read()
-                data = Data(self.client.getsockname(), receiver, 
-                        readfile, filename, filesize)
-                self.client.sendall(pickle.dumps(data))
-        except OSError:
-            print("Error sending image")
-            pass
+    def close_server(self):
+        self.sock.close()
 
-class dataReceiver:
-    def __init__(self, address='127.0.0.1', port='5000') -> None:
-        self.address = address
-        self.port = port
-        self.server = None
-
-    def open_socket(self):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server.bind((self.host, self.port))
-        self.server.listen(5)
-
-    def close_socket(self):
-        self.server.close()
+    def accept_connection(self):
+        self.client, self.client_address = self.sock.accept()
+        print(f"Connection from {self.client_address} has been established.")
 
     def run(self):
-        self.open_socket()
-        self.connection, self.sender_address = self.server.accept()
-        print("Connected to -> {}".format(self.sender_address))
+        self.start_server()
+        self.accept_connection()
         while True:
-            res = b''
+            full_msg = b''
+            new_msg = True
             while True:
-                recv_data = self.connection.recv(1024)
-                res += recv_data
-                if len(recv_data)<1024-1:
-                    break
-            data = pickle.loads(res)
+                msg = self.client.recv(constant.BUFFER)
+                if new_msg:
+                    msglen = int(msg[:constant.HEADERSIZE])
+                    new_msg = False
 
-            if data.filename is not None:
-                with open(data.filename, 'wb') as file:
-                    file.write(data.file)
+                full_msg += msg
+
+                if len(full_msg)-constant.HEADERSIZE == msglen:
+                    data = pickle.loads(full_msg[constant.HEADERSIZE:])
+                    print(data.filename)
+
+class Client:
+    def __init__(self, address='127.0.0.1', port=5000) -> None:
+        self.address = address
+        self.port = port
+        self.sock = None
+
+    def connect_to_server(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((self.address, self.port))
+    
+    def close_client(self):
+        self.sock.close()
+        sys.exit(0)
+
+    def send_data(self, filename):
+        self.connect_to_server()
+        fname = 'images/'+filename
+        fsize = os.path.getsize(fname)
+        rfile = b''
+        with open(fname, 'rb') as file:
+            while True:
+                data = file.read()
+                rfile += data
+                if not data: break
+        file.close()
+
+        data_to_send = Data(rfile, fsize, filename)
+        print(data_to_send.filename)
+        print(data_to_send.filesize)
+        print(data_to_send.file)
+
+        data_to_send = pickle.dumps(data_to_send)
+        data_to_send = bytes(f"{len(data_to_send):<{constant.HEADERSIZE}}", 'utf-8')+data_to_send
+        if self.sock.send(data_to_send):
+            self.close_client()

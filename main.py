@@ -11,7 +11,6 @@ class Main:
         tStop = threading.Event()
         self.camera.capture(tStop)
         while True:
-            # print(threading.enumerate())
 
             self.camera.start()
 
