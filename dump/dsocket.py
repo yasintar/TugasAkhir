@@ -2,7 +2,7 @@ import socket
 import os
 import sys
 from data import Data
-import constant
+from constant import HEADERSIZE, BUFFER
 import pickle
 
 class Server:
@@ -28,20 +28,25 @@ class Server:
     def run(self):
         self.start_server()
         self.accept_connection()
+        
+        full_msg = b''
+        new_msg = True
         while True:
-            full_msg = b''
-            new_msg = True
-            while True:
-                msg = self.client.recv(constant.BUFFER)
-                if new_msg:
-                    msglen = int(msg[:constant.HEADERSIZE])
-                    new_msg = False
+            msg = self.client.recv(BUFFER)
+            if new_msg:
+                print(msg[:HEADERSIZE])
+                msglen = int(msg[:HEADERSIZE])
+                new_msg = False
 
-                full_msg += msg
+            full_msg += msg
 
-                if len(full_msg)-constant.HEADERSIZE == msglen:
-                    data = pickle.loads(full_msg[constant.HEADERSIZE:])
-                    print(data.filename)
+            if len(full_msg)-HEADERSIZE == msglen:
+                data = pickle.loads(full_msg[HEADERSIZE:])
+                print(self.client)
+                print(self.client_address)
+
+                file = open(data.filename, 'wb')
+                file.write(data.file)
 
 class Client:
     def __init__(self, address='127.0.0.1', port=5000) -> None:
@@ -70,11 +75,9 @@ class Client:
         file.close()
 
         data_to_send = Data(rfile, fsize, filename)
-        print(data_to_send.filename)
-        print(data_to_send.filesize)
-        print(data_to_send.file)
 
         data_to_send = pickle.dumps(data_to_send)
-        data_to_send = bytes(f"{len(data_to_send):<{constant.HEADERSIZE}}", 'utf-8')+data_to_send
+        data_to_send = bytes(f"{len(data_to_send):<{HEADERSIZE}}", 'utf-8')+data_to_send
+        print(int(data_to_send[:HEADERSIZE]))
         if self.sock.send(data_to_send):
             self.close_client()

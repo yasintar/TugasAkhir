@@ -1,11 +1,12 @@
-from logging import exception
 import cv2 as cv
 from datetime import datetime
 import threading
 
+from constant import DEVICECAMERA, TIME
+
 class Cam:
     def __init__(self) -> None:
-        self.cap = cv.VideoCapture(0)
+        self.cap = cv.VideoCapture(DEVICECAMERA)
         self.frame = None
 
 
@@ -22,7 +23,7 @@ class Cam:
     def capture(self, tStop):
         self.captureThread()
         if not tStop.is_set():
-            threading.Timer(10, self.capture, [tStop]).start()
+            threading.Timer(TIME, self.capture, [tStop]).start()
 
     def captureThread(self):
         print("Capture")
