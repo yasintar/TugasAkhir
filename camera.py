@@ -8,14 +8,19 @@ class Cam:
     def __init__(self) -> None:
         self.cap = cv.VideoCapture(DEVICECAMERA)
         self.frame = None
-
+        self.start()
 
     def start(self):
-        ret, self.frame = self.cap.read()
-        if not ret:
-            print('Camera Module not Connected')
-        cv.imshow('Stream', self.frame)
-
+        while True:
+            try:
+                ret, self.frame = self.cap.read()
+                if not ret:
+                    raise Exception('Camera Module not detected')
+                cv.imshow('Stream', self.frame)
+            except KeyboardInterrupt:
+                print("Closing camera ...")
+                self.stop()
+        
     def stop(self):
         self.cap.release()
         cv.destroyAllWindows()
