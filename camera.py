@@ -8,18 +8,16 @@ class Cam:
     def __init__(self) -> None:
         self.cap = cv.VideoCapture(DEVICECAMERA)
         self.frame = None
-        self.start()
 
     def start(self):
-        while True:
-            try:
-                ret, self.frame = self.cap.read()
-                if not ret:
-                    raise Exception('Camera Module not detected')
-                cv.imshow('Stream', self.frame)
-            except KeyboardInterrupt:
-                print("Closing camera ...")
-                self.stop()
+        try:
+            ret, self.frame = self.cap.read()
+            if not ret:
+                raise Exception('Camera Module not detected')
+            cv.imshow('Stream', self.frame)
+        except KeyboardInterrupt:
+            print("Closing camera ...")
+            self.stop()
         
     def stop(self):
         self.cap.release()
@@ -40,3 +38,5 @@ class Cam:
 
 if __name__ == "__main__":
     camera = Cam()
+    while True:
+        camera.start()
