@@ -2,18 +2,18 @@ import cv2 as cv
 from datetime import datetime
 import threading
 
-from constant import DEVICECAMERA, TIME
+from constant import *
 
 class Cam:
-    def __init__(self) -> None:
-        self.cap = cv.VideoCapture(DEVICECAMERA)
+    def __init__(self, debug=True) -> None:
+        if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
+        else: self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
         self.frame = None
 
     def start(self):
         try:
             while True:
                 ret, self.frame = self.cap.read()
-                print(self.frame)
                 if not ret:
                     raise Exception('Camera Module not detected')
                 cv.imshow('Stream', self.frame)
@@ -43,5 +43,11 @@ class Cam:
                 raise Exception('Could not write image')
 
 if __name__ == "__main__":
-    camera = Cam()
+    flag = input()
+    debug = None
+    if flag == 'debug':
+        debug = True
+    else:
+        debug = False
+    camera = Cam(debug=debug)
     camera.start()
