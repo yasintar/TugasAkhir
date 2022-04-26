@@ -1,13 +1,16 @@
 import cv2 as cv
 from datetime import datetime
 import threading
+import os
 
 from constant import *
 
 class Cam:
     def __init__(self, debug=True) -> None:
         if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
-        else: self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
+        else: 
+            os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
+            self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
         self.frame = None
 
     def start(self):
