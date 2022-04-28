@@ -1,7 +1,7 @@
 import socket
 import os
 import sys
-from data import Data
+from dump.data import Data
 from constant import HEADERSIZE, BUFFER
 import pickle
 
