@@ -15,16 +15,15 @@ class Cam:
 
     def start(self):
         try:
-            while True:
-                ret, self.frame = self.cap.read()
-                if not ret:
-                    raise Exception('Camera Module not detected')
-                cv.imshow('Stream', self.frame)
+            ret, self.frame = self.cap.read()
+            if not ret:
+                raise Exception('Camera Module not detected')
+            # cv.imshow('Stream', self.frame)
 
-                c = cv.waitKey(5)
-                if c == 27:
-                    break
-        except KeyboardInterrupt:
+            c = cv.waitKey(5)
+            if c == 27:
+                self.stop()
+        except KeyboardInterrupt or OSError:
             print("Closing camera ...")
             self.stop()
         
@@ -53,4 +52,5 @@ if __name__ == "__main__":
     else:
         debug = False
     camera = Cam(debug=debug)
-    camera.start()
+    while True:
+        camera.start()
