@@ -2,11 +2,13 @@ import cv2 as cv
 from datetime import datetime
 import threading
 import os
+import time
 
 from constant import *
 
 class Cam:
     def __init__(self, debug=True) -> None:
+        self.timeToCapture = None
         if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
         else: 
             os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
@@ -18,7 +20,7 @@ class Cam:
             ret, self.frame = self.cap.read()
             if not ret:
                 raise Exception('Camera Module not detected')
-            # cv.imshow('Stream', self.frame)
+            cv.imshow('Stream', self.frame)
 
             c = cv.waitKey(5)
             if c == 27:
@@ -31,18 +33,27 @@ class Cam:
         self.cap.release()
         cv.destroyAllWindows()
 
-    def capture(self, tStop):
-        self.captureThread()
-        if not tStop.is_set():
-            threading.Timer(TIME, self.capture, [tStop]).start()
+    def setTimeToCapture(self, t):
+        if t == 0:
+            self.timeToCapture = TIME
+        else:
+            self.timeToCapture = t
 
-    def captureThread(self):
-        print("Capture")
-        now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-        name = "./images/{}.png".format(now)
-        if self.frame is not None:
-            if not cv.imwrite(name, self.frame):
-                raise Exception('Could not write image')
+    def getTimeToCapture(self):
+        return self.timeToCapture
+
+    def capture(self):
+        if self.timeToCapture is not None:
+            threading.Timer(self.timeToCapture, self.capture).start()
+            print("Capture")
+            now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+            name = "./image/{}.png".format(now)
+            if self.frame is not None:
+                if not cv.imwrite(filename=name, img=self.frame):
+                    self.stop()
+                    raise Exception('Could not write image')
+            else:
+                print("Frame not detected yet")
 
 if __name__ == "__main__":
     flag = input()
@@ -52,5 +63,7 @@ if __name__ == "__main__":
     else:
         debug = False
     camera = Cam(debug=debug)
+    camera.setTimeToCapture(10)
+    camera.capture()
     while True:
         camera.start()

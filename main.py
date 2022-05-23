@@ -10,14 +10,14 @@ class Main:
     def run(self):
         tStop = threading.Event()
         self.camera.capture(tStop)
-        while True:
+        try:
+            while True:
 
-            self.camera.start()
-
-            k = cv.waitKey(5) & 0xFF
-            if k == 27:
-                break
-        self.camera.stop()
+                self.camera.start()
+        except IOError or OSError or KeyboardInterrupt:
+            self.camera.stop()
+        finally:
+            print("System Stopped")
 
 if __name__=="__main__":
     main = Main()
