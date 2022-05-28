@@ -1,6 +1,6 @@
 import cv2 as cv
 from datetime import datetime
-import threading
+from threading import Thread, Timer
 import os
 import time
 
@@ -14,6 +14,7 @@ class Cam:
             os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
             self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
         self.frame = None
+        self.captureThread = Thread(target=self.capture, name="CAPTURE")
 
     def start(self):
         try:
@@ -30,6 +31,7 @@ class Cam:
             self.stop()
         
     def stop(self):
+        self.captureThread.join()
         self.cap.release()
         cv.destroyAllWindows()
 
@@ -44,16 +46,18 @@ class Cam:
 
     def capture(self):
         if self.timeToCapture is not None:
-            threading.Timer(self.timeToCapture, self.capture).start()
-            print("Capture")
-            now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-            name = "./image/{}.png".format(now)
-            if self.frame is not None:
-                if not cv.imwrite(filename=name, img=self.frame):
-                    self.stop()
-                    raise Exception('Could not write image')
-            else:
-                print("Frame not detected yet")
+            while True:
+                # self.captureThread = threading.Timer(self.timeToCapture, self.capture).start()
+                # print("Capture")
+                now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+                name = "./image/{}.png".format(now)
+                if self.frame is not None:
+                    if not cv.imwrite(filename=name, img=self.frame):
+                        self.stop()
+                        raise Exception('Could not write image')
+                else:
+                    print("Frame not detected yet")
+                time.sleep(self.timeToCapture)
 
 if __name__ == "__main__":
     flag = input()
@@ -63,7 +67,10 @@ if __name__ == "__main__":
     else:
         debug = False
     camera = Cam(debug=debug)
-    camera.setTimeToCapture(10)
-    camera.capture()
+    camera.setTimeToCapture(5)
+    # camera.capture()
     while True:
         camera.start()
+        n = input()
+        if n == 'n':
+            camera.stop()

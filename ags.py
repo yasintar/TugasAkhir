@@ -19,20 +19,20 @@ Apabila Disk penuh, latest image dihapus, dan hanya mengambil
 ketika terjadi sebuah event
 """
 import psutil
-import time
 from threading import Thread
 from constant import *
 
 class AGS(Thread):
     def __init__(self, debug=True) -> None:
         Thread.__init__(self)
+        self.RAMWarning = False
         if debug:
-            self.timeInterval = 1
+            self.timeToCapture = 1
             self._cpu = None
             self._ram = None
             self._disk = None
         else:
-            self.timeInterval = 1
+            self.timeToCapture = 1
             self._cpu = psutil.cpu_percent(0.1)
             self._ram = psutil.virtual_memory()[2]
             self._disk = psutil.disk_usage('/')[3]
@@ -46,20 +46,33 @@ class AGS(Thread):
     def getCurrentDiskStat(self):
         return self._disk
 
+    def getRAMWarning(self):
+        return self.RAMWarning
+
     def setCurrentStat(self, cpu, ram, disk):
         self._cpu = cpu
         self._ram = ram
         self._disk = disk
 
     def watchCPU(self):
+        tempCpuVal = 0
         while True:
             if self._cpu > CONST_CPU:
-                print("CPU Usage Exceed")
-        
+                if self._cpu > tempCpuVal:
+                    self.timeToCapture = self.timeToCapture + 1
+                    print("CPU Usage Exceed")
+            else:
+                if self.timeToCapture > 1:
+                    self.timeToCapture = self.timeToCapture - 1
+            tempCpuVal = self._cpu
+
     def watchRAM(self):
         while True:
             if self._ram > CONST_RAM:
+                self.RAMWarning = True
                 print("RAM Usage Exceed")
+            else:
+                self.RAMWarning = False
 
     def watchDisk(self):
         while True:
@@ -76,20 +89,23 @@ class AGS(Thread):
             self.RAMThread.start()
             self.DiskThread.start()
         except KeyboardInterrupt or OSError:
-            self.CPUThread.join()
-            self.RAMThread.join()
-            self.RAMThread.join()
+            self.stop()
+
+    def stop(self):
+        self.CPUThread.join()
+        self.RAMThread.join()
+        self.RAMThread.join()
 
 if __name__=="__main__":
     ags = AGS()
 
-    raw_input = input("format cpu,ram,disk :")
-    cpu, ram, disk = raw_input.split(',')
-    ags.setCurrentStat(int(cpu), int(ram), int(disk))
+    # raw_input = input("format cpu,ram,disk :")
+    # cpu, ram, disk = raw_input.split(',')
+    # ags.setCurrentStat(int(cpu), int(ram), int(disk))
 
-    print("CPU Status: {}".format(ags.getCurrentCPUStat()))
-    print("RAM Stat: {}".format(ags.getCurrentRAMStat()))
-    print("Disk Stat: {}".format(ags.getCurrentDiskStat()))
+    # print("CPU Status: {}".format(ags.getCurrentCPUStat()))
+    # print("RAM Stat: {}".format(ags.getCurrentRAMStat()))
+    # print("Disk Stat: {}".format(ags.getCurrentDiskStat()))
     
     ags.start()
     

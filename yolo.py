@@ -4,7 +4,7 @@ import numpy as np
 from constant import *
 
 class YOLO:
-    def __init__(self, weight, cfg):
+    def __init__(self, weight=YOLO_WEIGHT, cfg=YOLO_CFG):
         self.net = cv.dnn.readNet(weight,cfg)
 
     def detect(self, image):
