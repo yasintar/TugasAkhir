@@ -9,6 +9,6 @@ YOLO_CONFI          = 0.45
 YOLO_WEIGHT         = './model/yolo-obj_last.weights'
 YOLO_CFG            = './model/yolo-obj.cfg'
 
-CONST_CPU           = 20      #Batas usage CPU jika lebih do something
+CONST_CPU           = 80      #Batas usage CPU jika lebih do something
 CONST_RAM           = 80      #Batas usage RAM jika lebih do something
 CONST_DISK          = 80     #Batas usage Disk jika lebih do something

@@ -1,3 +1,5 @@
+import watchdog.events
+import watchdog.observers
 import cv2 as cv
 import numpy as np
 
@@ -36,7 +38,47 @@ class YOLO:
         blob = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
         self.net.setInput(blob)
 
+class EventHandler(watchdog.events.PatternMatchingEventHandler):
+    def __init__(self):
+        self.yoloDetector = YOLO()
+        self.yoloRes = None
+        self.isNewFileDetected = False
+        watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.png'],
+                                                             ignore_directories=True, case_sensitive=False)
+  
+    def on_created(self, event):
+        print("Watchdog received created event - % s." % event.src_path)
+        result = self.yoloDetector.detect(event.src_path)
+        self.setYoloResult(result)
+        print("YOLO Res : ", self.getYoloResult())
+
+    def setYoloResult(self, result):
+        self.yoloRes = result
+
+    def getYoloResult(self):
+        return self.yoloRes
+
+class YoloHandler:
+    def __init__(self):
+        self.event_handler = EventHandler()
+        self.observer = watchdog.observers.Observer()
+
+    def start(self):
+        self.observer.schedule(self.event_handler, path=IMG_PATH, recursive=True)
+        self.observer.start()
+        try:
+            while True:
+                pass
+        except KeyboardInterrupt or OSError:
+            self.stop()
+
+    def stop(self):
+        self.observer.stop()
+        self.observer.join()
+
+    def getYoloResult(self):
+        return self.event_handler.getYoloResult()
+
 if __name__=="__main__":
-    detector = YOLO("./model/yolo-obj_last.weights","./model/yolo-obj.cfg")
-    detector.detect("./image/coba.jpg")
-    if detector: print("success")
+    detector = YoloHandler()
+    detector.start()

@@ -1,5 +1,5 @@
 from camera import Cam
-from yolo import YOLO
+from yolo import YoloHandler
 from ags import AGS
 from relay import Relay
 import functools
@@ -7,7 +7,7 @@ import functools
 class Main:
     def __init__(self) -> None:
         self.camera = Cam(debug=True)
-        self.yolodetector = YOLO()
+        self.yolodetector = YoloHandler()
         self.ags = AGS(debug=False)
         self.relay = Relay()
         self.runable = True
@@ -17,26 +17,38 @@ class Main:
     def run(self):
         self.ags.start()
 
+        self.yolodetector.start()
+
         self.camera.setTimeToCapture(0)
         self.camera.captureThread.start()
         
-        while self.runable:
-            self.camera.start()
-            self.camera.setTimeToCapture(self.ags.timeToCapture)
+        try:
+            while self.runable:
+                self.camera.start()
+                self.camera.setTimeToCapture(self.ags.timeToCapture)
 
-            if self.ags.getRAMWarning():
-                self.restart()
+                if self.ags.getRAMWarning():
+                    self.runable = False
+
+                if self.yolodetector.getYoloResult() is not None:
+                    pass
+            self.restart()
+        except KeyboardInterrupt or OSError:
+            self.stop()
 
     def restart(self):
-        if self.runable:
-            self.ags.stop()
-            self.ags.join()
-            self.camera.stop()
-
-            self.runable = False
+        if not self.runable:
+            self.stop()
+            self.runable = True
             self.ags = AGS(debug=False)
             self.run.cache_clear()
             self.run()
+
+    def stop(self):
+        self.ags.stop()
+        self.ags.join()
+        self.camera.stop()
+        self.yolodetector.stop()
 
 if __name__=="__main__":
     main = Main()
