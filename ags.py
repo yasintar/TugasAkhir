@@ -22,9 +22,8 @@ import psutil
 from threading import Thread
 from constant import *
 
-class AGS(Thread):
+class AGS():
     def __init__(self, debug=True) -> None:
-        Thread.__init__(self)
         self.RAMWarning = False
         if debug:
             self.timeToCapture = 1
@@ -57,27 +56,30 @@ class AGS(Thread):
     def watchCPU(self):
         tempCpuVal = 0
         while True:
-            if self._cpu > CONST_CPU:
-                if self._cpu > tempCpuVal:
-                    self.timeToCapture = self.timeToCapture + 1
-                    print("CPU Usage Exceed")
-            else:
-                if self.timeToCapture > 1:
-                    self.timeToCapture = self.timeToCapture - 1
-            tempCpuVal = self._cpu
+            if self._cpu:
+                if self._cpu > CONST_CPU:
+                    if self._cpu > tempCpuVal:
+                        self.timeToCapture = self.timeToCapture + 1
+                        print("CPU Usage Exceed")
+                else:
+                    if self.timeToCapture > 1:
+                        self.timeToCapture = self.timeToCapture - 1
+                tempCpuVal = self._cpu
 
     def watchRAM(self):
         while True:
-            if self._ram > CONST_RAM:
-                self.RAMWarning = True
-                print("RAM Usage Exceed")
-            else:
-                self.RAMWarning = False
+            if self._ram:
+                if self._ram > CONST_RAM:
+                    self.RAMWarning = True
+                    print("RAM Usage Exceed")
+                else:
+                    self.RAMWarning = False
 
     def watchDisk(self):
         while True:
-            if self._disk > CONST_DISK:
-                print("Internal Disk is full")
+            if self._disk:
+                if self._disk > CONST_DISK:
+                    print("Internal Disk is full")
 
     def run(self):
         try:
@@ -107,5 +109,5 @@ if __name__=="__main__":
     # print("RAM Stat: {}".format(ags.getCurrentRAMStat()))
     # print("Disk Stat: {}".format(ags.getCurrentDiskStat()))
     
-    ags.start()
+    ags.run()
     

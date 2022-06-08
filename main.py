@@ -15,7 +15,7 @@ class Main:
 
     @functools.lru_cache(maxsize = None)
     def run(self):
-        self.ags.start()
+        self.ags.run()
 
         self.yolodetector.start()
 
@@ -40,13 +40,12 @@ class Main:
         if not self.runable:
             self.stop()
             self.runable = True
-            self.ags = AGS(debug=False)
+            self.ags.run()
             self.run.cache_clear()
             self.run()
 
     def stop(self):
         self.ags.stop()
-        self.ags.join()
         self.camera.stop()
         self.yolodetector.stop()
 
