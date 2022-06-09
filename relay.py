@@ -10,3 +10,6 @@ class Relay:
 
     def run(self):
         pass
+
+    def appendYoloRes(self, res):
+        pass

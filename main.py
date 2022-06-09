@@ -10,7 +10,9 @@ class Main:
         self.yolodetector = YoloHandler()
         self.ags = AGS(debug=False)
         self.relay = Relay()
+
         self.runable = True
+        self.isDetected = 0
         self.run()
 
     @functools.lru_cache(maxsize = None)
@@ -31,7 +33,8 @@ class Main:
                     self.runable = False
 
                 if self.yolodetector.getYoloResult() is not None:
-                    pass
+                    self.isDetected = 1
+                    
             self.restart()
         except KeyboardInterrupt or OSError:
             self.stop()
