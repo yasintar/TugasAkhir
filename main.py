@@ -12,11 +12,11 @@ class Main:
         self.relay = Relay()
 
         self.runable = True
-        self.isDetected = 0
-        self.run()
+        self.isRelayOn = False
+        self.start()
 
     @functools.lru_cache(maxsize = None)
-    def run(self):
+    def start(self):
         self.ags.run()
 
         self.yolodetector.start()
@@ -33,7 +33,9 @@ class Main:
                     self.runable = False
 
                 if self.yolodetector.getYoloResult() is not None:
-                    self.isDetected = 1
+                    self.relay.appendYoloRes(True)
+                else:
+                    self.relay.appendYoloRes(False)
                     
             self.restart()
         except KeyboardInterrupt or OSError:
@@ -44,8 +46,8 @@ class Main:
             self.stop()
             self.runable = True
             self.ags.run()
-            self.run.cache_clear()
-            self.run()
+            self.start.cache_clear()
+            self.start()
 
     def stop(self):
         self.ags.stop()

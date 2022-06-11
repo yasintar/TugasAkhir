@@ -12,3 +12,5 @@ YOLO_CFG            = './model/yolo-obj.cfg'
 CONST_CPU           = 80      #Batas usage CPU jika lebih do something
 CONST_RAM           = 80      #Batas usage RAM jika lebih do something
 CONST_DISK          = 80     #Batas usage Disk jika lebih do something
+
+MAX_RELAY_LIST      = 5
