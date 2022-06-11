@@ -8,11 +8,12 @@ from constant import *
 
 class Cam:
     def __init__(self, debug=True) -> None:
-        self.timeToCapture = None
+        self.isDebug = debug
         if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
         else: 
             os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
             self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
+        self.timeToCapture = None
         self.frame = None
         self.captureThread = Thread(target=self.capture, name="CAPTURE")
 
@@ -21,7 +22,7 @@ class Cam:
             ret, self.frame = self.cap.read()
             if not ret:
                 raise Exception('Camera Module not detected')
-            cv.imshow('Stream', self.frame)
+            if debug: cv.imshow('Stream', self.frame)
 
             c = cv.waitKey(5)
             if c == 27:
