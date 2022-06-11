@@ -1,7 +1,6 @@
 from camera import Cam
 from yolo import YoloHandler
 from ags import AGS
-from relay import Relay
 
 import argparse
 import functools
@@ -14,6 +13,7 @@ class Main:
             self.ags = AGS(debug=False)
             self.relay = None
         else:
+            from relay import Relay
             self.camera = Cam(debug=False)
             self.yolodetector = YoloHandler()
             self.ags = AGS(debug=False)
@@ -44,9 +44,9 @@ class Main:
                     self.runable = False
 
                 if self.yolodetector.getYoloResult() is not None:
-                    self.relay.appendYoloRes(True)
+                    if self.relay is not None: self.relay.appendYoloRes(True)
                 else:
-                    self.relay.appendYoloRes(False)
+                    if self.relay is not None: self.relay.appendYoloRes(False)
                     
             self.restart()
         except KeyboardInterrupt or OSError:
@@ -69,4 +69,8 @@ class Main:
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="to debug with webcam")
-    main = Main()
+    args = parser.parse_args()
+    if args.debug:
+        Main(True)
+    else:
+        Main()

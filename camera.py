@@ -22,7 +22,7 @@ class Cam:
             ret, self.frame = self.cap.read()
             if not ret:
                 raise Exception('Camera Module not detected')
-            if debug: cv.imshow('Stream', self.frame)
+            if self.isDebug: cv.imshow('Stream', self.frame)
 
             c = cv.waitKey(5)
             if c == 27:
