@@ -1,4 +1,3 @@
-from ast import arg
 from camera import Cam
 from yolo import YoloHandler
 from ags import AGS
