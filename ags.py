@@ -20,11 +20,13 @@ ketika terjadi sebuah event
 """
 import psutil
 from threading import Thread
+import time
 from constant import *
 
 class AGS():
     def __init__(self, debug=True) -> None:
         self.RAMWarning = False
+        self.isStopped = False
         if debug:
             self.timeToCapture = 1
             self._cpu = None
@@ -65,6 +67,9 @@ class AGS():
                     if self.timeToCapture > 1:
                         self.timeToCapture = self.timeToCapture - 1
                 tempCpuVal = self._cpu
+            
+            if self.isStopped:
+                break
 
     def watchRAM(self):
         while True:
@@ -74,6 +79,8 @@ class AGS():
                     print("RAM Usage Exceed")
                 else:
                     self.RAMWarning = False
+            if self.isStopped:
+                break
 
     def watchDisk(self):
         while True:
@@ -81,7 +88,11 @@ class AGS():
                 if self._disk > CONST_DISK:
                     print("Internal Disk is full")
 
+            if self.isStopped:
+                break
+
     def run(self):
+        print("[]\tAGS Starting .....")
         try:
             self.CPUThread = Thread(target=self.watchCPU, name="CPU")
             self.RAMThread = Thread(target=self.watchRAM, name="RAM")
@@ -94,9 +105,12 @@ class AGS():
             self.stop()
 
     def stop(self):
+        self.isStopped = True
+        time.sleep(2)
         self.CPUThread.join()
         self.RAMThread.join()
         self.RAMThread.join()
+        print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":
     ags = AGS()

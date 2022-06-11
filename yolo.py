@@ -2,6 +2,7 @@ import watchdog.events
 import watchdog.observers
 import cv2 as cv
 import numpy as np
+import time
 
 from constant import *
 
@@ -60,6 +61,8 @@ class EventHandler(watchdog.events.PatternMatchingEventHandler):
 
 class YoloHandler:
     def __init__(self):
+        print("[]\tYOLO Starting.....")
+        self.isStopped = False
         self.event_handler = EventHandler()
         self.observer = watchdog.observers.Observer()
 
@@ -68,13 +71,17 @@ class YoloHandler:
         self.observer.start()
         try:
             while True:
-                pass
+                if self.isStopped:
+                    break
         except KeyboardInterrupt or OSError:
             self.stop()
 
     def stop(self):
+        self.isStopped = True
+        time.sleep(2)
         self.observer.stop()
         self.observer.join()
+        print("[]\tYOLO Stopping.....")
 
     def getYoloResult(self):
         return self.event_handler.getYoloResult()

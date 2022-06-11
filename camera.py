@@ -9,6 +9,7 @@ from constant import *
 class Cam:
     def __init__(self, debug=True) -> None:
         self.isDebug = debug
+        self.isStopped = False
         if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
         else: 
             os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
@@ -16,6 +17,7 @@ class Cam:
         self.timeToCapture = None
         self.frame = None
         self.captureThread = Thread(target=self.capture, name="CAPTURE")
+        print("[]\tCAMERA Starting.....")
 
     def start(self):
         try:
@@ -32,9 +34,12 @@ class Cam:
             self.stop()
         
     def stop(self):
+        self.isStopped = True
+        time.sleep(2)
         self.captureThread.join()
         self.cap.release()
         cv.destroyAllWindows()
+        print("[]\tCAMERA Stopping .....")
 
     def setTimeToCapture(self, t):
         if t == 0:
@@ -59,6 +64,8 @@ class Cam:
                 else:
                     print("Frame not detected yet")
                 time.sleep(self.timeToCapture)
+                if self.isStopped:
+                    break
 
 if __name__ == "__main__":
     flag = input()
