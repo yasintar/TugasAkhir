@@ -76,7 +76,7 @@ if __name__ == "__main__":
         debug = False
     camera = Cam(debug=debug)
     camera.setTimeToCapture(5)
-    # camera.capture()
+    camera.capture()
     while True:
         camera.start()
         n = input()

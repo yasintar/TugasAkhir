@@ -114,14 +114,6 @@ class AGS():
 
 if __name__=="__main__":
     ags = AGS()
-
-    # raw_input = input("format cpu,ram,disk :")
-    # cpu, ram, disk = raw_input.split(',')
-    # ags.setCurrentStat(int(cpu), int(ram), int(disk))
-
-    # print("CPU Status: {}".format(ags.getCurrentCPUStat()))
-    # print("RAM Stat: {}".format(ags.getCurrentRAMStat()))
-    # print("Disk Stat: {}".format(ags.getCurrentDiskStat()))
     
     ags.run()
     

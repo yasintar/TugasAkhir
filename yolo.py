@@ -7,7 +7,8 @@ import time
 from constant import *
 
 class YOLO:
-    def __init__(self, weight=YOLO_WEIGHT, cfg=YOLO_CFG):
+    def __init__(self, weight=YOLO_WEIGHT, cfg=YOLO_CFG, stream=False):
+        self.stream = stream
         self.net = cv.dnn.readNet(weight,cfg)
 
     def detect(self, image):
@@ -32,10 +33,13 @@ class YOLO:
         return self.confiAvg(confidences)
 
     def confiAvg(self, confidences):
-        return sum(confidences)/len(confidences)
+        if len(confidences) != 0:
+            return sum(confidences)/len(confidences)
+        return 0
 
     def prepareImg(self, image):
-        image = cv.imread(image)
+        if not self.stream:
+            image = cv.imread(image)
         blob = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
         self.net.setInput(blob)
 
@@ -87,5 +91,8 @@ class YoloHandler:
         return self.event_handler.getYoloResult()
 
 if __name__=="__main__":
-    detector = YoloHandler()
-    detector.start()
+    # detector = YoloHandler()
+    # detector.start()
+
+    detector = YOLO()
+    print(detector.detect('image/coba.jpg'))
