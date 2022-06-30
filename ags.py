@@ -64,6 +64,7 @@ class AGS():
                         self.timeToCapture = self.timeToCapture + 1
                         print("CPU Usage Exceed")
                 else:
+                    print('CPU is Safe '+str(self._cpu))
                     if self.timeToCapture > 1:
                         self.timeToCapture = self.timeToCapture - 1
                 tempCpuVal = self._cpu
@@ -78,6 +79,7 @@ class AGS():
                     self.RAMWarning = True
                     print("RAM Usage Exceed")
                 else:
+                    print('Ram is Safe '+str(self._ram))
                     self.RAMWarning = False
             if self.isStopped:
                 break
@@ -87,7 +89,8 @@ class AGS():
             if self._disk:
                 if self._disk > CONST_DISK:
                     print("Internal Disk is full")
-
+            else:
+                print('Disk is Safe '+str(self._disk))
             if self.isStopped:
                 break
 
