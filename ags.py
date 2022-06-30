@@ -56,6 +56,7 @@ class AGS():
         self._disk = disk
 
     def watchCPU(self):
+        print("Watching CPU")
         tempCpuVal = 0
         while True:
             if self._cpu:
@@ -73,6 +74,7 @@ class AGS():
                 break
 
     def watchRAM(self):
+        print("Watching RAM")
         while True:
             if self._ram:
                 if self._ram > CONST_RAM:
@@ -85,6 +87,7 @@ class AGS():
                 break
 
     def watchDisk(self):
+        print("Watching Disk")
         while True:
             if self._disk:
                 if self._disk > CONST_DISK:
