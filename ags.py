@@ -119,7 +119,7 @@ class AGS():
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":
-    ags = AGS()
+    ags = AGS(debug=False)
     
     ags.run()
     
