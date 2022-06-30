@@ -68,9 +68,13 @@ while True:
         break
     
     cv.imshow('frame', frame)
-    detect = yolo.detect(frame)
 
-    print(str(detect))
+    print("type of frame var -> " + type(frame))
+    print(frame)
+
+    # detect = yolo.detect(frame)
+
+    # print(str(detect))
 
     c = cv.waitKey(5)
     if c == 27:

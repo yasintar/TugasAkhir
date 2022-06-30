@@ -20,7 +20,7 @@ class Cam:
         print("[]\tCAMERA Starting.....")
 
     def start(self):
-        try:
+        # try:
             ret, self.frame = self.cap.read()
             if not ret:
                 raise Exception('Camera Module not detected')
@@ -29,9 +29,9 @@ class Cam:
             c = cv.waitKey(5)
             if c == 27:
                 self.stop()
-        except KeyboardInterrupt or OSError:
-            print("Closing camera ...")
-            self.stop()
+        # except KeyboardInterrupt or OSError:
+        #     print("Closing camera ...")
+        #     self.stop()
         
     def stop(self):
         self.isStopped = True
@@ -68,15 +68,9 @@ class Cam:
                     break
 
 if __name__ == "__main__":
-    flag = input()
-    debug = None
-    if flag == 'debug':
-        debug = True
-    else:
-        debug = False
-    camera = Cam(debug=debug)
-    camera.setTimeToCapture(5)
-    camera.capture()
+    camera = Cam()
+    # camera.setTimeToCapture(5)
+    # camera.capture()
     while True:
         camera.start()
         n = input()
