@@ -68,7 +68,9 @@ while True:
         break
     
     cv.imshow('frame', frame)
-    # print(yolo.detect(frame))
+    detect = yolo.detect(frame)
+
+    print(str(detect))
 
     c = cv.waitKey(5)
     if c == 27:
