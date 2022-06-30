@@ -89,8 +89,8 @@ class AGS():
             if self._disk:
                 if self._disk > CONST_DISK:
                     print("Internal Disk is full")
-            else:
-                print('Disk is Safe '+str(self._disk))
+                else:
+                    print('Disk is Safe '+str(self._disk))
             if self.isStopped:
                 break
 
