@@ -69,7 +69,7 @@ while True:
     
     cv.imshow('frame', frame)
 
-    print("type of frame var -> " + type(frame))
+    print("type of frame var -> " + str(type(frame)))
     print(frame)
 
     # detect = yolo.detect(frame)
