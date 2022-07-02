@@ -14,8 +14,7 @@ class YOLO:
     def detect(self, image):
         self.prepareImg(image=image)
         layer_names = self.net.getLayerNames()
-        print(self.net.getUnconnectedOutLayers())
-        output_layers = [layer_names[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
+        output_layers = [layer_names[i - 1] for i in self.net.getUnconnectedOutLayers()]
 
         confidences = []
         class_ids = []
