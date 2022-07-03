@@ -21,22 +21,26 @@ ketika terjadi sebuah event
 import psutil
 from threading import Thread
 import time
+from random import randint
 from constant import *
 
 class AGS():
     def __init__(self, debug=True) -> None:
         self.RAMWarning = False
-        self.isStopped = False
+        self.isWatchStopped = False
+        self.counterUpthCPU = 1
+        self.counterUpthRAM = 1
+        self.systemStopFlag = False
+        self.timeToCapture = 1
+        self.timeToProcess = 1
         if debug:
-            self.timeToCapture = 1
             self._cpu = None
             self._ram = None
             self._disk = None
         else:
-            self.timeToCapture = 1
             self._cpu = psutil.cpu_percent(0.1)
             self._ram = psutil.virtual_memory()[2]
-            self._disk = psutil.disk_usage('/')[3]
+            # self._disk = psutil.disk_usage('/')[3]
 
     def getCurrentCPUStat(self):
         return self._cpu
@@ -57,33 +61,33 @@ class AGS():
 
     def watchCPU(self):
         print("Watching CPU")
-        tempCpuVal = 0
         while True:
             if self._cpu:
-                if self._cpu > CONST_CPU:
-                    if self._cpu > tempCpuVal:
-                        self.timeToCapture = self.timeToCapture + 1
-                        print("CPU Usage Exceed")
-                else:
-                    print('CPU is Safe '+str(self._cpu))
-                    if self.timeToCapture > 1:
-                        self.timeToCapture = self.timeToCapture - 1
-                tempCpuVal = self._cpu
+                if self._cpu > CONST_CPU and self._cpu < FULL_RESOURCE:
+                    self.timeToProcess = randint(1,5)*self.counterUpthCPU
+                    self.counterUpthCPU = self.counterUpthCPU + 1
+                elif self._cpu >= FULL_RESOURCE:
+                    self.systemStopFlag = True
+                elif self._cpu < CONST_CPU:
+                    self.counterUpthCPU = 1
             
-            if self.isStopped:
+            if self.isWatchStopped:
                 break
 
     def watchRAM(self):
         print("Watching RAM")
         while True:
             if self._ram:
-                if self._ram > CONST_RAM:
+                if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
+                    if self.RAMWarning : self.RAMWarning = False
+                    self.timeToCapture = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
+                elif self._ram >= FULL_RESOURCE:
                     self.RAMWarning = True
-                    print("RAM Usage Exceed")
-                else:
-                    print('Ram is Safe '+str(self._ram))
+                elif self._ram < CONST_RAM:
+                    self.counterUpthRAM = 1
                     self.RAMWarning = False
-            if self.isStopped:
+
+            if self.isWatchStopped:
                 break
 
     def watchDisk(self):
@@ -94,7 +98,7 @@ class AGS():
                     print("Internal Disk is full")
                 else:
                     print('Disk is Safe '+str(self._disk))
-            if self.isStopped:
+            if self.isWatchStopped:
                 break
 
     def run(self):
@@ -102,20 +106,20 @@ class AGS():
         try:
             self.CPUThread = Thread(target=self.watchCPU, name="CPU")
             self.RAMThread = Thread(target=self.watchRAM, name="RAM")
-            self.DiskThread = Thread(target=self.watchDisk, name="DISK")
+            # self.DiskThread = Thread(target=self.watchDisk, name="DISK")
 
             self.CPUThread.start()
             self.RAMThread.start()
-            self.DiskThread.start()
+            # self.DiskThread.start()
         except KeyboardInterrupt or OSError:
             self.stop()
 
     def stop(self):
-        self.isStopped = True
+        self.isWatchStopped = True
         time.sleep(2)
         self.CPUThread.join()
         self.RAMThread.join()
-        self.RAMThread.join()
+        # self.DiskThread.join()
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":
