@@ -27,10 +27,10 @@ from constant import *
 class AGS():
     def __init__(self, debug=True) -> None:
         self.RAMWarning = False
+        self.CPUWarning = False
         self.isWatchStopped = False
         self.counterUpthCPU = 1
         self.counterUpthRAM = 1
-        self.systemStopFlag = False
         self.timeToCapture = 1
         self.timeToProcess = 1
         if debug:
@@ -40,7 +40,7 @@ class AGS():
         else:
             self._cpu = psutil.cpu_percent(0.1)
             self._ram = psutil.virtual_memory()[2]
-            # self._disk = psutil.disk_usage('/')[3]
+            self._disk = psutil.disk_usage('/')[3]
 
     def getCurrentCPUStat(self):
         return self._cpu
@@ -53,6 +53,9 @@ class AGS():
 
     def getRAMWarning(self):
         return self.RAMWarning
+
+    def getCPUWarning(self):
+        return self.CPUWarning
 
     def setCurrentStat(self, cpu, ram, disk):
         self._cpu = cpu
@@ -67,7 +70,7 @@ class AGS():
                     self.timeToProcess = randint(1,5)*self.counterUpthCPU
                     self.counterUpthCPU = self.counterUpthCPU + 1
                 elif self._cpu >= FULL_RESOURCE:
-                    self.systemStopFlag = True
+                    self.CPUWarning = True
                 elif self._cpu < CONST_CPU:
                     self.counterUpthCPU = 1
             
