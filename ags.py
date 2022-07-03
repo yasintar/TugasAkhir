@@ -1,23 +1,3 @@
-"""
-Algorithm Granularity Settings
-
-Pengaturan yang dilakukan untuk dapat memaksimalkan kinerja program
-untuk data stream mining supaya resource komputer tidak cepat penuh
-
-Program ini mengatur Resource berikut
-1. CPU
-
-Apabila Konsumsi CPU -> TINGGI, Waktu penangkapan gambar dikurangi
-
-2. RAM
-
-Apabila RAM telah terkonsumsi tinggi, cache dikurangi
-
-3. Disk
-
-Apabila Disk penuh, latest image dihapus, dan hanya mengambil
-ketika terjadi sebuah event
-"""
 import psutil
 from threading import Thread
 import time
@@ -25,7 +5,11 @@ from random import randint
 from constant import *
 
 class AGS():
-    def __init__(self, debug=True) -> None:
+    def __init__(self, withCPU, withRAM, withDisk, debug=True) -> None:
+        self.withCPU = withCPU
+        self.withRAM = withRAM
+        self.withDisk = withDisk
+
         self.RAMWarning = False
         self.CPUWarning = False
         self.isWatchStopped = False
@@ -33,6 +17,7 @@ class AGS():
         self.counterUpthRAM = 1
         self.timeToCapture = 1
         self.timeToProcess = 1
+
         if debug:
             self._cpu = None
             self._ram = None
@@ -107,22 +92,24 @@ class AGS():
     def run(self):
         print("[]\tAGS Starting .....")
         try:
-            self.CPUThread = Thread(target=self.watchCPU, name="CPU")
-            self.RAMThread = Thread(target=self.watchRAM, name="RAM")
-            # self.DiskThread = Thread(target=self.watchDisk, name="DISK")
-
-            self.CPUThread.start()
-            self.RAMThread.start()
-            # self.DiskThread.start()
+            if self.withCPU: 
+                self.CPUThread = Thread(target=self.watchCPU, name="CPU")
+                self.CPUThread.start()
+            if self.withRAM: 
+                self.RAMThread = Thread(target=self.watchRAM, name="RAM")
+                self.RAMThread.start()
+            if self.withDisk: 
+                self.DiskThread = Thread(target=self.watchDisk, name="DISK")
+                self.DiskThread.start()
         except KeyboardInterrupt or OSError:
             self.stop()
 
     def stop(self):
         self.isWatchStopped = True
         time.sleep(2)
-        self.CPUThread.join()
-        self.RAMThread.join()
-        # self.DiskThread.join()
+        if self.CPUThread is not None: self.CPUThread.join()
+        if self.RAMThread is not None: self.RAMThread.join()
+        if self.DiskThread is not None: self.DiskThread.join()
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":

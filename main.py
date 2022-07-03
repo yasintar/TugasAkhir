@@ -6,7 +6,7 @@ import argparse
 import functools
 
 class Main:
-    def __init__(self, debug) -> None:
+    def __init__(self, debug, cpuFlag=True, ramFlag=True, diskFlag=True):
         if debug:
             self.camera = Cam(debug=True)
             self.yolodetector = YoloHandler()
@@ -68,7 +68,10 @@ class Main:
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--debug", help="to debug with webcam")
+    parser.add_argument("-s", "--debug", help="to debug with webcam", action="store_true")
+    parser.add_argument("-c", "--cpu", help="to watch CPU avaibality", action="store_true")
+    parser.add_argument("-r", "--ram", help="to watch RAM avaibality", action="store_true")
+    parser.add_argument("-d", "--disk", help="to watch Internal Storage avaibality", action="store_true")
     args = parser.parse_args()
     if args.debug:
         Main(True)
