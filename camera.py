@@ -23,7 +23,7 @@ class Cam:
         # try:
             ret, self.frame = self.cap.read()
             if not ret:
-                raise Exception('Camera Module not detected')
+                raise Exception('[]\t(CAMERA) Camera Module not detected')
             if self.isDebug: cv.imshow('Stream', self.frame)
 
             c = cv.waitKey(5)
@@ -60,9 +60,9 @@ class Cam:
                 if self.frame is not None:
                     if not cv.imwrite(filename=name, img=self.frame):
                         self.stop()
-                        raise Exception('Could not write image')
+                        raise Exception('[]\t(CAMERA) Could not write image')
                 else:
-                    print("Frame not detected yet")
+                    print("[]\t(CAMERA) Frame not detected yet")
                 time.sleep(self.timeToCapture)
                 if self.isStopped:
                     break

@@ -37,7 +37,7 @@ class Relay:
         self.isStopped = True
         time.sleep(2)
         self.relayRun.join()
-        print("[]\tYOLO Stoppings.....")
+        print("[]\tRelay Stopping.....")
 
     def appendYoloRes(self, res):
         self._yoloRes.push(res)

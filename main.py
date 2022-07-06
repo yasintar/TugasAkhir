@@ -10,13 +10,13 @@ class Main:
         if debug:
             self.camera = Cam(debug=True)
             self.yolodetector = YoloHandler()
-            self.ags = AGS(debug=False)
+            self.ags = AGS(cpuFlag, ramFlag, diskFlag, debug=False)
             self.relay = None
         else:
             from relay import Relay
             self.camera = Cam(debug=False)
             self.yolodetector = YoloHandler()
-            self.ags = AGS(debug=False)
+            self.ags = AGS(cpuFlag, ramFlag, diskFlag, debug=False)
             self.relay = Relay()
 
         self.runable = True
@@ -40,7 +40,7 @@ class Main:
                 self.camera.start()
                 self.camera.setTimeToCapture(self.ags.timeToCapture)
 
-                if self.ags.getRAMWarning():
+                if self.ags.getRAMWarning() or self.ags.getCPUWarning():
                     self.runable = False
 
                 if self.yolodetector.getYoloResult() is not None:

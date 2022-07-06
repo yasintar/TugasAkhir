@@ -47,7 +47,6 @@ class EventHandler(watchdog.events.PatternMatchingEventHandler):
     def __init__(self):
         self.yoloDetector = YOLO()
         self.yoloRes = None
-        self.isNewFileDetected = False
         watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.png'],
                                                              ignore_directories=True, case_sensitive=False)
   

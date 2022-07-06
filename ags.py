@@ -48,22 +48,24 @@ class AGS():
         self._disk = disk
 
     def watchCPU(self):
-        print("Watching CPU")
+        print("[]\t(AGS) Watching CPU")
         while True:
             if self._cpu:
                 if self._cpu > CONST_CPU and self._cpu < FULL_RESOURCE:
+                    if self.CPUWarning : self.CPUWarning = False
                     self.timeToProcess = randint(1,5)*self.counterUpthCPU
                     self.counterUpthCPU = self.counterUpthCPU + 1
                 elif self._cpu >= FULL_RESOURCE:
                     self.CPUWarning = True
                 elif self._cpu < CONST_CPU:
+                    if self.CPUWarning : self.CPUWarning = False
                     self.counterUpthCPU = 1
             
             if self.isWatchStopped:
                 break
 
     def watchRAM(self):
-        print("Watching RAM")
+        print("[]\t(AGS) Watching RAM")
         while True:
             if self._ram:
                 if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
@@ -73,19 +75,17 @@ class AGS():
                     self.RAMWarning = True
                 elif self._ram < CONST_RAM:
                     self.counterUpthRAM = 1
-                    self.RAMWarning = False
+                    if self.RAMWarning : self.RAMWarning = False
 
             if self.isWatchStopped:
                 break
 
     def watchDisk(self):
-        print("Watching Disk")
+        print("[]\t(AGS) Watching Disk")
         while True:
             if self._disk:
                 if self._disk > CONST_DISK:
                     print("Internal Disk is full")
-                else:
-                    print('Disk is Safe '+str(self._disk))
             if self.isWatchStopped:
                 break
 
@@ -113,7 +113,7 @@ class AGS():
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":
-    ags = AGS(debug=False)
+    ags = AGS(True, True, False, debug=False)
     
     ags.run()
     
