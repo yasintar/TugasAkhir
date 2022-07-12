@@ -4,6 +4,7 @@ from ags import AGS
 
 import argparse
 import functools
+import subprocess
 
 class Main:
     def __init__(self, debug, cpuFlag=True, ramFlag=True, diskFlag=True):
@@ -57,6 +58,8 @@ class Main:
             self.stop()
             self.runable = True
             self.start.cache_clear()
+            RAMClearing = subprocess.run(["sudo", "sh", "freeRAM.sh"], stdout=subprocess.PIPE,stderr=subprocess.PIPE, text=True)
+            print(RAMClearing.stdout)
             self.start()
 
     def stop(self):
