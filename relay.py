@@ -30,6 +30,8 @@ class Relay:
             if self.isStopped:
                 break
 
+            time.sleep(TIMESLEEPTHREAD)
+
     def start(self):
         self.relayRun.start()
 

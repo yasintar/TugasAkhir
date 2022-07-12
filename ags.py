@@ -42,6 +42,12 @@ class AGS():
     def getCPUWarning(self):
         return self.CPUWarning
 
+    def getTimeToProcess(self):
+        return self.timeToProcess
+    
+    def getTimeToCapture(self):
+        return self.timeToCapture
+
     def setCurrentStat(self, cpu, ram, disk):
         self._cpu = cpu
         self._ram = ram
@@ -64,6 +70,8 @@ class AGS():
             if self.isWatchStopped:
                 break
 
+            time.sleep(TIMESLEEPTHREAD)
+
     def watchRAM(self):
         print("[]\t(AGS) Watching RAM")
         while True:
@@ -80,6 +88,8 @@ class AGS():
             if self.isWatchStopped:
                 break
 
+            time.sleep(TIMESLEEPTHREAD)
+
     def watchDisk(self):
         print("[]\t(AGS) Watching Disk")
         while True:
@@ -89,7 +99,9 @@ class AGS():
             if self.isWatchStopped:
                 break
 
-    def run(self):
+            time.sleep(TIMESLEEPTHREAD)
+
+    def start(self):
         print("[]\tAGS Starting .....")
         try:
             if self.withCPU: 

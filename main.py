@@ -1,10 +1,12 @@
 from camera import Cam
+from constant import TIMESLEEPTHREAD
 from yolo import YoloHandler
 from ags import AGS
 
 import argparse
 import functools
 import subprocess
+import time
 
 class Main:
     def __init__(self, debug, cpuFlag=True, ramFlag=True, diskFlag=True):
@@ -26,20 +28,23 @@ class Main:
 
     @functools.lru_cache(maxsize = None)
     def start(self):
-        self.ags.run()
+        self.ags.start()
 
         self.yolodetector.start()
 
         self.camera.setTimeToCapture(0)
-        self.camera.captureThread.start()
+        self.camera.start()
 
         if self.relay is not None:
             self.relay.start()
         
         try:
             while self.runable:
-                self.camera.start()
-                self.camera.setTimeToCapture(self.ags.timeToCapture)
+                self.camera.setTimeToCapture(self.ags.getTimeToCapture())
+                self.yolodetector.setAgsTimeout(self.ags.getTimeToProcess)
+
+                if self.ags.getCPUWarning():
+                    pass
 
                 if self.ags.getRAMWarning():
                     self.runable = False
@@ -48,12 +53,15 @@ class Main:
                     if self.relay is not None: self.relay.appendYoloRes(True)
                 else:
                     if self.relay is not None: self.relay.appendYoloRes(False)
-                    
-            self.restart()
+
+                time.sleep(TIMESLEEPTHREAD)
+
+            self.RAMrestart()
         except KeyboardInterrupt or OSError:
+            print("KEYBOARD MAIN")
             self.stop()
 
-    def restart(self):
+    def RAMrestart(self):
         if not self.runable:
             self.stop()
             self.runable = True
@@ -66,7 +74,6 @@ class Main:
         self.ags.stop()
         self.yolodetector.stop()
         self.camera.stop()
-        self.yolodetector.stop()
         if self.relay is not None: self.relay.stop()
 
 if __name__=="__main__":

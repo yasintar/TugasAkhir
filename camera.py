@@ -16,26 +16,39 @@ class Cam:
             self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
         self.timeToCapture = None
         self.frame = None
+        self.name = None
         self.captureThread = Thread(target=self.capture, name="CAPTURE")
+        self.streamThread  = Thread(target=self.stream, name="CAMERA STREAM")
         print("[]\tCAMERA Starting.....")
 
-    def start(self):
-        # try:
+    def stream(self):
+        while True:
             ret, self.frame = self.cap.read()
             if not ret:
-                raise Exception('[]\t(CAMERA) Camera Module not detected')
+                print('[]\t(CAMERA) Camera Module not detected')
             if self.isDebug: cv.imshow('Stream', self.frame)
 
             c = cv.waitKey(5)
             if c == 27:
                 self.stop()
-        # except KeyboardInterrupt or OSError:
-        #     print("Closing camera ...")
-        #     self.stop()
+
+            if self.isStopped:
+                break
+
+            time.sleep(TIMESLEEPTHREAD)
+
+    def start(self):
+        if not self.isStopped:
+            self.streamThread.daemon = True
+            self.captureThread.daemon = True
+
+            self.streamThread.start()
+            self.captureThread.start()
         
     def stop(self):
         self.isStopped = True
         time.sleep(2)
+        self.streamThread.join()
         self.captureThread.join()
         self.cap.release()
         cv.destroyAllWindows()
@@ -50,27 +63,28 @@ class Cam:
     def getTimeToCapture(self):
         return self.timeToCapture
 
+    def getImageName(self):
+        return self.name
+
     def capture(self):
         if self.timeToCapture is not None:
             while True:
-                # self.captureThread = threading.Timer(self.timeToCapture, self.capture).start()
-                # print("Capture")
                 now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-                name = "./image/{}.png".format(now)
+                self.name = "./image/{}.png".format(now)
                 if self.frame is not None:
-                    if not cv.imwrite(filename=name, img=self.frame):
+                    if not cv.imwrite(filename=self.name, img=self.frame):
                         self.stop()
                         raise Exception('[]\t(CAMERA) Could not write image')
                 else:
                     print("[]\t(CAMERA) Frame not detected yet")
-                time.sleep(self.timeToCapture)
+                
                 if self.isStopped:
                     break
 
+                time.sleep(self.timeToCapture)
+
 if __name__ == "__main__":
     camera = Cam()
-    # camera.setTimeToCapture(5)
-    # camera.capture()
     while True:
         camera.start()
         n = input()
