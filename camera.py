@@ -1,6 +1,6 @@
 import cv2 as cv
 from datetime import datetime
-from threading import Thread, Timer
+from threading import Thread
 import os
 import time
 
