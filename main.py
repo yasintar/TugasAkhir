@@ -41,7 +41,7 @@ class Main:
                 self.camera.start()
                 self.camera.setTimeToCapture(self.ags.timeToCapture)
 
-                if self.ags.getRAMWarning() or self.ags.getCPUWarning():
+                if self.ags.getRAMWarning():
                     self.runable = False
 
                 if self.yolodetector.getYoloResult() is not None:
