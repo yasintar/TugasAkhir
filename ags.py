@@ -118,7 +118,7 @@ class AGS():
 
     def stop(self):
         self.isWatchStopped = True
-        time.sleep(2)
+        time.sleep(TIMESLEEPTHREAD)
         if self.CPUThread is not None: self.CPUThread.join()
         if self.RAMThread is not None: self.RAMThread.join()
         if self.DiskThread is not None: self.DiskThread.join()

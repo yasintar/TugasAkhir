@@ -47,7 +47,7 @@ class Cam:
         
     def stop(self):
         self.isStopped = True
-        time.sleep(2)
+        time.sleep(TIMESLEEPTHREAD)
         self.streamThread.join()
         self.captureThread.join()
         self.cap.release()

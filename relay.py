@@ -37,7 +37,7 @@ class Relay:
 
     def stop(self):
         self.isStopped = True
-        time.sleep(2)
+        time.sleep(TIMESLEEPTHREAD)
         self.relayRun.join()
         print("[]\tRelay Stopping.....")
 
