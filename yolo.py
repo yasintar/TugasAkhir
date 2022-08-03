@@ -17,6 +17,7 @@ class YOLO:
         self.timeout = 0
         self.yoloThread = Thread(target=self.run, name="YOLO")
         self.net = cv.dnn.readNet(weight,cfg)
+        self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
     def detect(self, image):
         try:
