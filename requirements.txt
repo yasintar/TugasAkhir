@@ -1,5 +1,0 @@
-numpy==1.17.4
-opencv_python==4.5.1.48
-psutil==5.9.0
-scikit_learn==1.1.1
-watchdog==2.1.8
