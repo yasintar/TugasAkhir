@@ -1,7 +1,4 @@
 from threading import Thread
-import watchdog.events
-import watchdog.observers
-import contextlib
 import cv2 as cv
 import numpy as np
 import time
