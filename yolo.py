@@ -43,7 +43,7 @@ class YOLO:
             print(str(e))
             self.result = 0
         finally:
-            print(self.result)
+            print("[]\tYOLO detect result : "+str(self.result))
 
     def confiAvg(self, confidences):
         if len(confidences) != 0:
