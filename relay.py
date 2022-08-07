@@ -5,7 +5,7 @@ from constant import *
 
 class Relay:
     def __init__(self):
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setup(RELAIS_1_GPIO, GPIO.OUT)
         self._yoloRes = tinyList()
         self.isStopped = False
@@ -38,6 +38,7 @@ class Relay:
     def stop(self):
         self.isStopped = True
         time.sleep(TIMESLEEPTHREAD)
+        GPIO.cleanup()
         self.relayRun.join()
         print("[]\tRelay Stopping.....")
 
