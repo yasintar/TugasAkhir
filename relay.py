@@ -59,3 +59,14 @@ class tinyList:
 
     def getList(self):
         return self.list
+
+if __name__=="__main__":
+    relay = Relay()
+    while True:
+        x = input()
+        if str(x) == 'q':
+            break
+        elif str(x) == 'w':
+            relay.turnOnRelay
+        elif str(x) == 'e':
+            relay.turnOffRelay
