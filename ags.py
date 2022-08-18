@@ -14,12 +14,18 @@ class AGS():
 
         self.CPUData = []
         self.RAMData = []
+        self.DiskData = []
 
         self.RAMWarning = False
         self.CPUWarning = False
+        self.DiskWarning = False
+
         self.isWatchStopped = False
+
         self.counterUpthCPU = 1
         self.counterUpthRAM = 1
+        self.counterUpthDisk = 1
+        
         self.timeToCapture = 1
         self.timeToProcess = 1
 
@@ -46,6 +52,9 @@ class AGS():
 
     def getCPUWarning(self):
         return self.CPUWarning
+
+    def getDiskWarning(self):
+        return self.DiskWarning
 
     def getTimeToProcess(self):
         return self.timeToProcess
@@ -104,11 +113,22 @@ class AGS():
             time.sleep(TIMESLEEPTHREAD)
 
     def watchDisk(self):
-        print("[]\t(AGS) Watching Disk")
+        print("[]\t(AGS) Watching Disk Space")
+        DiskStartTime = time.time()
         while True:
-            if self._disk:
-                if self._disk > CONST_DISK:
-                    print("Internal Disk is full")
+            if self._ram:
+                DiskTemp = None
+                if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
+                    if self.DiskWarning : self.DiskWarning = False
+                    self.timeToCapture = 1 + (1 - (CONST_DISK/100)) * self.counterUpthDisk
+                elif self._disk >= FULL_RESOURCE:
+                    self.DiskWarning = True
+                elif self._disk < CONST_DISK:
+                    self.counterUpthDisk = 1
+                    if self.DiskWarning : self.DiskWarning = False
+                DiskTemp = [datetime.now().strftime("%H:%M:%S"), time.time()-DiskStartTime, self._disk]
+                self.DiskData.append(DiskTemp)
+
             if self.isWatchStopped:
                 break
 
@@ -141,6 +161,9 @@ class AGS():
 
         RAMdf = pd.DataFrame(self.RAMData, columns=['Time', 'Time_Elapsed', 'RAM_Precentage'])
         RAMdf.to_csv('RAM.csv', index=True)
+
+        Diskdf = pd.DataFrame(self.DiskData, columns=['Time', 'Time_Elapsed', 'Disk_Precentage'])
+        Diskdf.to_csv('Disk.csv', index=True)
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":

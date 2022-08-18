@@ -56,6 +56,11 @@ class Main:
                 if self.ags.getRAMWarning():
                     self.runable = False
 
+                if self.ags.getDiskWarning():
+                    DiskClearing = subprocess.run(["sudo", "sh", "freeSpace.sh"], stdout=subprocess.PIPE,stderr=subprocess.PIPE, text=True)
+                    print(DiskClearing.stdout)
+                    time.sleep(5)
+
                 if self.yolo.getYoloResult() is not None:
                     if self.relay is not None: self.relay.appendYoloRes(True)
                 else:
