@@ -1,6 +1,8 @@
 import psutil
 from threading import Thread
 import time
+from datetime import datetime
+import pandas as pd
 from random import randint
 from constant import *
 
@@ -9,6 +11,9 @@ class AGS():
         self.withCPU = withCPU
         self.withRAM = withRAM
         self.withDisk = withDisk
+
+        self.CPUData = []
+        self.RAMData = []
 
         self.RAMWarning = False
         self.CPUWarning = False
@@ -55,8 +60,10 @@ class AGS():
 
     def watchCPU(self):
         print("[]\t(AGS) Watching CPU")
+        CPUStartTime = time.time()
         while True:
             if self._cpu:
+                CPUTemp = None
                 if self._cpu > CONST_CPU and self._cpu < FULL_RESOURCE:
                     if self.CPUWarning : self.CPUWarning = False
                     self.timeToProcess = randint(1,5)*self.counterUpthCPU
@@ -66,7 +73,9 @@ class AGS():
                 elif self._cpu < CONST_CPU:
                     if self.CPUWarning : self.CPUWarning = False
                     self.counterUpthCPU = 1
-            
+                CPUTemp = [datetime.now().strftime("%H:%M:%S"), time.time()-CPUStartTime, self._cpu]
+                self.CPUData.append(CPUTemp)
+
             if self.isWatchStopped:
                 break
 
@@ -74,8 +83,10 @@ class AGS():
 
     def watchRAM(self):
         print("[]\t(AGS) Watching RAM")
+        RAMStartTime = time.time()
         while True:
             if self._ram:
+                RAMTemp = None
                 if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
                     if self.RAMWarning : self.RAMWarning = False
                     self.timeToCapture = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
@@ -84,6 +95,8 @@ class AGS():
                 elif self._ram < CONST_RAM:
                     self.counterUpthRAM = 1
                     if self.RAMWarning : self.RAMWarning = False
+                RAMTemp = [datetime.now().strftime("%H:%M:%S"), time.time()-RAMStartTime, self._ram]
+                self.RAMData.append(RAMTemp)
 
             if self.isWatchStopped:
                 break
@@ -122,10 +135,16 @@ class AGS():
         if self.CPUThread is not None: self.CPUThread.join()
         if self.RAMThread is not None: self.RAMThread.join()
         if self.DiskThread is not None: self.DiskThread.join()
+
+        CPUdf = pd.DataFrame(self.CPUData, columns=['Time', 'Time_Elapsed', 'CPU_Precentage'])
+        CPUdf.to_csv('CPU.csv', index=True)
+
+        RAMdf = pd.DataFrame(self.RAMData, columns=['Time', 'Time_Elapsed', 'RAM_Precentage'])
+        RAMdf.to_csv('RAM.csv', index=True)
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":
     ags = AGS(True, True, False, debug=False)
     
-    ags.run()
+    ags.start()
     
