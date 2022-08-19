@@ -94,7 +94,4 @@ if __name__=="__main__":
     parser.add_argument("-r", "--ram", help="to watch RAM avaibality", action="store_true")
     parser.add_argument("-d", "--disk", help="to watch Internal Storage avaibality", action="store_true")
     args = parser.parse_args()
-    if args.debug:
-        Main(True)
-    else:
-        Main()
+    Main(args.debug, args.cpu, args.ram, args.disk)
