@@ -18,37 +18,25 @@ class Cam:
         self.frame = None
         self.name = None
         self.captureThread = Thread(target=self.capture, name="CAPTURE")
-        # self.streamThread  = Thread(target=self.stream, name="CAMERA STREAM")
         print("[]\tCAMERA Starting.....")
 
     def stream(self):
-        # while True:
         ret, self.frame = self.cap.read()
         if not ret:
             print('[]\t(CAMERA) Camera Module not detected')
-        if self.isDebug: cv.imshow('Stream', self.frame)
+        else: cv.imshow('Stream', self.frame)
 
         c = cv.waitKey(5)
         if c == 27:
             self.stop()
 
-            # if self.isStopped:
-            #     break
-
-            # time.sleep(TIMESLEEPTHREAD)
-
     def startCapture(self):
         if not self.isStopped:
-            # self.streamThread.daemon = True
-            self.captureThread.daemon = True
-
-            # self.streamThread.start()
             self.captureThread.start()
         
     def stop(self):
         self.isStopped = True
         time.sleep(TIMESLEEPTHREAD)
-        # self.streamThread.join()
         self.captureThread.join()
         self.cap.release()
         cv.destroyAllWindows()
