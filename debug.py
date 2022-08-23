@@ -57,28 +57,40 @@
 #         cv2.destroyAllWindows()
 #         break
 
-import cv2 as cv
-from yolo import YOLO
+# import cv2 as cv
+# from yolo import YOLO
 
-cap = cv.VideoCapture(0)
-yolo = YOLO(stream=True)
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+# cap = cv.VideoCapture(0)
+# yolo = YOLO(stream=True)
+# while True:
+#     ret, frame = cap.read()
+#     if not ret:
+#         break
     
-    cv.imshow('frame', frame)
+#     cv.imshow('frame', frame)
 
-    # print("type of frame var -> " + str(type(frame)))
-    # print(frame)
+#     # print("type of frame var -> " + str(type(frame)))
+#     # print(frame)
 
-    detect = yolo.detect(frame)
+#     detect = yolo.detect(frame)
 
-    # print(str(detect))
+#     # print(str(detect))
 
-    c = cv.waitKey(5)
-    if c == 27:
+#     c = cv.waitKey(5)
+#     if c == 27:
+#         break
+
+# cap.release()
+# cv.destroyAllWindows()
+
+import cv2
+cap=cv2.VideoCapture("rtsp://admin:cctv1234@192.168.1.100:554/h264Preview_01_main")
+
+ret,frame = cap.read()
+while ret:
+    ret,frame = cap.read()
+    cv2.imshow("frame",frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
+cv2.destroyAllWindows()
 cap.release()
-cv.destroyAllWindows()

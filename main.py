@@ -33,7 +33,7 @@ class Main:
         self.yolo.start()
 
         self.camera.setTimeToCapture(0)
-        self.camera.start()
+        self.camera.startCapture()
 
         if self.relay is not None:
             self.relay.start()
@@ -42,6 +42,8 @@ class Main:
 
         try:
             while self.runable:
+                self.camera.stream()
+
                 self.camera.setTimeToCapture(self.ags.getTimeToCapture())
                 self.yolo.setTimeout(self.ags.getTimeToProcess())
 
