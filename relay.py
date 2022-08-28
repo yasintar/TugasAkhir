@@ -66,6 +66,7 @@ if __name__=="__main__":
     while True:
         x = input()
         if str(x) == 'q':
+            relay.stop()
             break
         elif str(x) == 'w':
             relay.turnOnRelay
