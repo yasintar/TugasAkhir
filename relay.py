@@ -5,7 +5,7 @@ from constant import *
 
 class Relay:
     def __init__(self):
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(RELAIS_1_GPIO, GPIO.OUT)
         self._yoloRes = tinyList()
         self.isStopped = False
