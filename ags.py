@@ -169,5 +169,10 @@ class AGS():
 if __name__=="__main__":
     ags = AGS(True, True, False, debug=False)
     
-    ags.start()
+    try:
+        ags.start()
+    except KeyboardInterrupt:
+        ags.stop()
+    finally:
+        exit()
     
