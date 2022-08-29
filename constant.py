@@ -16,4 +16,4 @@ CONST_RAM           = 80      #Batas usage RAM jika lebih do something
 CONST_DISK          = 80      #Batas usage Disk jika lebih do something
 
 MAX_RELAY_LIST      = 5
-RELAIS_1_GPIO       = 7
+RELAIS_1_GPIO       = 4
