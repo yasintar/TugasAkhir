@@ -6,7 +6,7 @@ import time
 from constant import *
 
 class YOLO:
-    def __init__(self, weight=YOLO_WEIGHT, cfg=YOLO_CFG, stream=False):
+    def __init__(self, withNCS, weight=YOLO_WEIGHT, cfg=YOLO_CFG, stream=False):
         self.stream = stream
         self.isStopped = False
         self.images = []
@@ -14,13 +14,13 @@ class YOLO:
         self.timeout = 0
         self.yoloThread = Thread(target=self.run, name="YOLO")
         self.net = cv.dnn.readNet(weight,cfg)
-        self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
+        if withNCS: self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
     def detect(self, image):
         try:
             self.prepareImg(image=image)
             layer_names = self.net.getLayerNames()
-            output_layers = [layer_names[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
+            output_layers = [layer_names[i - 1] for i in self.net.getUnconnectedOutLayers()]
 
             confidences = []
             class_ids = []
@@ -89,6 +89,6 @@ class YOLO:
         self.yoloThread.join()
     
 if __name__=="__main__":
-    detector = YOLO()
+    detector = YOLO(False)
     detector.detect("./image/coba.jpg")
     print(detector.getYoloResult())

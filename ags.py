@@ -12,6 +12,10 @@ class AGS():
         self.withRAM = withRAM
         self.withDisk = withDisk
 
+        self.CPUThread = None
+        self.RAMThread = None
+        self.DiskThread = None
+
         self.CPUData = []
         self.RAMData = []
         self.DiskData = []
