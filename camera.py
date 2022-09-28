@@ -24,7 +24,8 @@ class Cam:
         ret, self.frame = self.cap.read()
         if not ret:
             print('[]\t(CAMERA) Camera Module not detected')
-        else: cv.imshow('Stream', self.frame)
+        else: 
+            if self.isDebug: cv.imshow('Stream', self.frame)
 
         c = cv.waitKey(5)
         if c == 27:

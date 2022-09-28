@@ -9,16 +9,16 @@ import subprocess
 import time
 
 class Main:
-    def __init__(self, debug, cpuFlag=True, ramFlag=True, diskFlag=True):
+    def __init__(self, debug, withNCS=False, cpuFlag=True, ramFlag=True, diskFlag=True):
         if debug:
             self.camera = Cam(debug=True)
-            self.yolo = YOLO()
+            self.yolo = YOLO(withNCS)
             self.ags = AGS(cpuFlag, ramFlag, diskFlag, debug=False)
             self.relay = None
         else:
             from relay import Relay
             self.camera = Cam(debug=False)
-            self.yolo = YOLO()
+            self.yolo = YOLO(withNCS)
             self.ags = AGS(cpuFlag, ramFlag, diskFlag, debug=False)
             self.relay = Relay()
 
@@ -97,4 +97,4 @@ if __name__=="__main__":
     parser.add_argument("-d", "--disk", help="to watch Internal Storage avaibality", action="store_true")
     parser.add_argument("-n", "--ncs", help="work with Naural Computer Stick", action="store_true")
     args = parser.parse_args()
-    Main(args.debug, args.cpu, args.ram, args.disk)
+    Main(args.ncs, args.debug, args.cpu, args.ram, args.disk)
