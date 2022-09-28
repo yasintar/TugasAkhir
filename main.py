@@ -97,4 +97,4 @@ if __name__=="__main__":
     parser.add_argument("-d", "--disk", help="to watch Internal Storage avaibality", action="store_true")
     parser.add_argument("-n", "--ncs", help="work with Naural Computer Stick", action="store_true")
     args = parser.parse_args()
-    Main(args.ncs, args.debug, args.cpu, args.ram, args.disk)
+    Main(args.debug, args.ncs, args.cpu, args.ram, args.disk)
