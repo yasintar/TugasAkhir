@@ -33,14 +33,9 @@ class AGS():
         self.timeToCapture = 1
         self.timeToProcess = 1
 
-        if debug:
-            self._cpu = None
-            self._ram = None
-            self._disk = None
-        else:
-            self._cpu = psutil.cpu_percent(0.1)
-            self._ram = psutil.virtual_memory()[2]
-            self._disk = psutil.disk_usage('/')[3]
+        self._cpu = psutil.cpu_percent(0.1)
+        self._ram = psutil.virtual_memory()[2]
+        self._disk = psutil.disk_usage('/')[3]
 
     def getCurrentCPUStat(self):
         return self._cpu
@@ -75,6 +70,7 @@ class AGS():
         print("[]\t(AGS) Watching CPU")
         CPUStartTime = time.time()
         while True:
+            self._cpu = psutil.cpu_percent(0.1)
             if self._cpu:
                 CPUTemp = None
                 if self._cpu > CONST_CPU and self._cpu < FULL_RESOURCE:
@@ -98,6 +94,7 @@ class AGS():
         print("[]\t(AGS) Watching RAM")
         RAMStartTime = time.time()
         while True:
+            self._ram = psutil.virtual_memory()[2]
             if self._ram:
                 RAMTemp = None
                 if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
@@ -120,6 +117,7 @@ class AGS():
         print("[]\t(AGS) Watching Disk Space")
         DiskStartTime = time.time()
         while True:
+            self._disk = psutil.disk_usage('/')[3]
             if self._ram:
                 DiskTemp = None
                 if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
