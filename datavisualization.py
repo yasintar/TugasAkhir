@@ -14,13 +14,17 @@ if __name__=="__main__":
     data = pd.read_csv(args.file)
 
     data['Time'] = pd.to_datetime(data['Time'])
+    name = None
 
     if(args.cpu):
         plt.plot_date(data['Time'], data['CPU_Precentage'])
+        name = "CPU.png"
     elif(args.ram):
         plt.plot_date(data['Time'], data['RAM_Precentage'])
+        name = "RAM.png"
     elif(args.disk):
         plt.plot_date(data['Time'], data['Disk_Precentage'])
+        name = "Disk.png"
     
     plt.gcf().autofmt_xdate()
 
@@ -28,4 +32,5 @@ if __name__=="__main__":
     plt.gca().xaxis.set_major_formatter(date_format)
     plt.tight_layout()
 
+    plt.savefig(name, bbox_inches='tight')
     plt.show()
