@@ -1,6 +1,6 @@
 from camera import Cam
 from constant import TIMESLEEPTHREAD
-from yolo import YOLO
+from yolo import YoloHandler
 from ags import AGS
 
 import argparse
@@ -12,13 +12,13 @@ class Main:
     def __init__(self, debug, withNCS=False, cpuFlag=True, ramFlag=True, diskFlag=True):
         if debug:
             self.camera = Cam(debug=True)
-            self.yolo = YOLO(withNCS)
+            self.yolo = YoloHandler(withNCS)
             self.ags = AGS(cpuFlag, ramFlag, diskFlag, debug=False)
             self.relay = None
         else:
             from relay import Relay
             self.camera = Cam(debug=False)
-            self.yolo = YOLO(withNCS)
+            self.yolo = YoloHandler(withNCS)
             self.ags = AGS(cpuFlag, ramFlag, diskFlag, debug=False)
             self.relay = Relay()
 
@@ -37,20 +37,13 @@ class Main:
 
         if self.relay is not None:
             self.relay.start()
-        
-        imgNameTemp = None
 
         try:
             while self.runable:
                 self.camera.stream()
 
                 self.camera.setTimeToCapture(self.ags.getTimeToCapture())
-                self.yolo.setTimeout(self.ags.getTimeToProcess())
-
-                if self.camera.getImageName() is not None:
-                    if imgNameTemp != self.camera.getImageName():
-                        imgNameTemp = self.camera.getImageName()
-                        self.yolo.appendImage(self.camera.getImageName())
+                self.yolo.setAgsTimeout(self.ags.getTimeToProcess())
 
                 if self.ags.getCPUWarning():
                     self.yolo.timeout(10)

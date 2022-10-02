@@ -1,4 +1,7 @@
 from threading import Thread
+import watchdog.events
+import watchdog.observers
+import contextlib
 import cv2 as cv
 import numpy as np
 import time
@@ -8,11 +11,8 @@ from constant import *
 class YOLO:
     def __init__(self, withNCS, weight=YOLO_WEIGHT, cfg=YOLO_CFG, stream=False):
         self.stream = stream
-        self.isStopped = False
         self.images = []
-        self.result = None
-        self.timeout = 0
-        self.yoloThread = Thread(target=self.run, name="YOLO")
+        self.result = 0
         self.net = cv.dnn.readNet(weight,cfg)
         if withNCS: self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
@@ -35,12 +35,10 @@ class YOLO:
                         class_ids.append(class_id)
                         confidences.append(confidence)
                         
-            self.result = self.confiAvg(confidences)
+            return self.confiAvg(confidences)
         except Exception as e:
             print(str(e))
-            self.result = 0
-        finally:
-            print("[]\t(YOLO) detect result : "+str(self.result))
+            return 0
 
     def confiAvg(self, confidences):
         if len(confidences) != 0:
@@ -53,42 +51,87 @@ class YOLO:
         blob = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
         self.net.setInput(blob)
 
+class EventHandler(watchdog.events.PatternMatchingEventHandler):
+    def __init__(self, withNCS):
+        self.yoloDetector = YOLO(withNCS)
+        self.yoloRes = None
+        watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.png'],
+                                                             ignore_directories=True, case_sensitive=False)
+  
+    def on_created(self, event):
+        time.sleep(TIMESLEEPTHREAD)
+        result = self.yoloDetector.detect("./"+str(event.src_path[2:]))
+        self.setYoloResult(result)
+        print("[]\tYOLO Res in "+str(event.src_path[2:])+" : ", self.getYoloResult())
+
+    def setYoloResult(self, result):
+        self.yoloRes = result
+
     def getYoloResult(self):
-        return self.result
+        return self.yoloRes
 
-    def setTimeout(self, time):
-        self.timeout = time
+class YoloHandler(watchdog.observers.Observer):
+    def __init__(self, withNCS):
+        print("[]\tYOLO Starting.....")
+        self.isStopped = False
+        self.event_handler = EventHandler(withNCS)
+        self.observer = watchdog.observers.Observer()
+        self.handlerThread = Thread(target=self.run, name="YoloHandler")
+        self.agsTimeout = None
 
-    def appendImage(self, image):
-        self.images.append(image)
+    def dispatch_events(self, *args, **kwargs):
+        if not getattr(self, '_is_paused', False):
+            super(EventHandler, self).dispatch_events(*args, **kwargs)
+
+    def pause(self):
+        self._is_paused = True
+
+    def setAgsTimeout(self, num):
+        self.agsTimeout = num
+
+    def resume(self):
+        if self.agsTimeout is not None:
+            time.sleep(self.agsTimeout)
+        else:
+            time.sleep(self.timeout)  # allow interim events to be queued
+        self.event_queue.queue.clear()
+        self._is_paused = False
+
+    @contextlib.contextmanager
+    def ignore_events(self):
+        self.pause()
+        yield
+        self.resume()
 
     def run(self):
-        while True:
-            if self.images != []:
-                self.result = self.detect(self.images[0])
-                self.images.pop(0)
-
-                t_end = time.time() + self.timeout
-                while time.time() < t_end:
-                    if self.images != []:
-                        self.images.pop(0)
-            
-            if self.isStopped:
-                break
-
-            time.sleep(TIMESLEEPTHREAD)
+        self.observer.schedule(self.event_handler, path=IMG_PATH, recursive=True)
+        self.observer.start()
+        try:
+            while True:
+                if self.isStopped:
+                    break
+                time.sleep(TIMESLEEPTHREAD)
+        except KeyboardInterrupt:
+            pass
+            # self.stop()
 
     def start(self):
-        print("[]\tYOLO Starting .....")
-        self.yoloThread.start()
+        self.handlerThread.start()
 
     def stop(self):
-        print("[]\tYOLO Stopping .....")
         self.isStopped = True
-        time.sleep(TIMESLEEPTHREAD)
-        self.yoloThread.join()
+        self.observer.stop()
+        time.sleep(2)
+        self.observer.join()
+        self.handlerThread.join()
+        print("[]\tYOLO Stopping.....")
+
+    def getYoloResult(self):
+        return self.event_handler.getYoloResult()
     
 if __name__=="__main__":
+    # detector = YoloHandler()
+    # detector.start()
+
     detector = YOLO(False)
-    detector.detect("./image/coba.jpg")
-    print(detector.getYoloResult())
+    print(detector.detect("./image/coba.jpg"))
