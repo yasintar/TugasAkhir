@@ -13,10 +13,17 @@ class YOLO:
         self.stream = stream
         self.images = []
         self.result = 0
-        self.net = cv.dnn.readNet(weight,cfg)
-        if withNCS: self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
+        self.withNCS = withNCS
+        if self.withNCS: 
+            from openvino.inference_engine import IECore, IENetwork
+            self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
+            inferEngine = IECore()
+            inferNet = IENetwork(model=cfg, weights=weight)
+            self.execNet = inferEngine.load_network(network=inferNet, device_name="VPU")
+        else:
+            self.net = cv.dnn.readNet(weight,cfg)
 
-    def detect(self, image):
+    def detect(self, image):    
         try:
             self.prepareImg(image=image)
             layer_names = self.net.getLayerNames()
@@ -40,6 +47,13 @@ class YOLO:
             print(str(e))
             return 0
 
+    def detectWithNCS(self, image):
+        netOutput = list(self.net.outputs.keys())
+        image = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
+        input_blob = next(iter(self.net.inputs))
+        output = self.net.infer({input_blob: image})
+        print(output)
+
     def confiAvg(self, confidences):
         if len(confidences) != 0:
             return sum(confidences)/len(confidences)
@@ -55,6 +69,7 @@ class EventHandler(watchdog.events.PatternMatchingEventHandler):
     def __init__(self, withNCS):
         self.yoloDetector = YOLO(withNCS)
         self.yoloRes = None
+        self.withNCS = withNCS
         watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.png'],
                                                              ignore_directories=True, case_sensitive=False)
   
