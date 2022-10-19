@@ -46,7 +46,7 @@ class Main:
                 self.yolo.setAgsTimeout(self.ags.getTimeToProcess())
 
                 if self.ags.getCPUWarning():
-                    self.yolo.timeout(10)
+                    self.yolo.setAgsTimeout(10)
 
                 if self.ags.getRAMWarning():
                     self.runable = False
