@@ -2,6 +2,7 @@ from threading import Thread
 import watchdog.events
 import watchdog.observers
 import contextlib
+import pandas as pd
 import cv2 as cv
 import numpy as np
 import time
@@ -34,8 +35,16 @@ class YOLO:
                     if confidence > YOLO_CONFI:
                         class_ids.append(class_id)
                         confidences.append(confidence)
+
+            avg = self.confiAvg(confidences)
+
+            analyzefile = pd.DataFrame({
+                'filename': [image],
+                'score': [avg]
+            })
+            analyzefile.to_csv('YOLODetectLog.csv', mode='a', index=False, header=False)
                         
-            return self.confiAvg(confidences)
+            return avg
         except Exception as e:
             print(str(e))
             return 0
