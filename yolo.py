@@ -71,7 +71,7 @@ class YOLO:
     def isContinueProcess(self):
         if self.resumeTime is not None:
             now = datetime.now()
-            diff = self.resumeTime - now
+            diff = now - self.resumeTime
             diff = diff.total_seconds()
             if diff >= self.timeout:
                 return True
