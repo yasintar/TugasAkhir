@@ -9,12 +9,15 @@ class Relay:
         GPIO.setup(RELAIS_1_GPIO, GPIO.OUT)
         self._yoloRes = tinyList()
         self.isStopped = False
+        self.isTurnedOn = False
         self.relayRun = Thread(target=self.run, name="Relay")
 
     def turnOnRelay(self):
+        self.isTurnedOn = True
         GPIO.output(RELAIS_1_GPIO, GPIO.HIGH)
 
     def turnOffRelay(self):
+        self.isTurnedOn = False
         GPIO.output(RELAIS_1_GPIO, GPIO.LOW)
 
     def run(self):
@@ -43,7 +46,10 @@ class Relay:
         print("[]\tRelay Stopping.....")
 
     def appendYoloRes(self, res):
-        self._yoloRes.push(res)
+        if res==2:
+            self._yoloRes.push(self.isTurnedOn)
+        else:
+            self._yoloRes.push(res)
 
     def getYoloResList(self):
         return self._yoloRes.getList()
