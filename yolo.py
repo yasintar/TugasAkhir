@@ -2,7 +2,6 @@ from threading import Thread
 from datetime import datetime
 import watchdog.events
 import watchdog.observers
-import contextlib
 import pandas as pd
 import cv2 as cv
 import numpy as np
@@ -22,7 +21,7 @@ class YOLO:
 
     def detect(self, image):
         if not self.isContinueProcess():
-            return
+            return 2
         elif self.isContinueProcess():
             self.timeout = None
             self.resumeTime = None
