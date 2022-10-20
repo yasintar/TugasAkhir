@@ -81,6 +81,7 @@ class YOLO:
         if self.resumeTime is None:
             self.resumeTime = datetime.now()
             self.timeout = num
+            print("[]\tYOLO process delay for {} s".format(num))
 
 class EventHandler(watchdog.events.PatternMatchingEventHandler):
     def __init__(self, withNCS):
