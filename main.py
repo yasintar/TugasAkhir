@@ -56,9 +56,9 @@ class Main:
                     print(DiskClearing.stdout)
                     time.sleep(5)
 
-                if self.yolo.getYoloResult() is not None:
+                if self.yolo.getYoloResult()>0:
                     if self.relay is not None: self.relay.appendYoloRes(True)
-                else:
+                elif self.yolo.getYoloResult()<=0:
                     if self.relay is not None: self.relay.appendYoloRes(False)
 
                 time.sleep(TIMESLEEPTHREAD)
