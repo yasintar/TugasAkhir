@@ -106,6 +106,7 @@ class EventHandler(watchdog.events.PatternMatchingEventHandler):
 class YoloHandler(watchdog.observers.Observer):
     def __init__(self, withNCS):
         print("[]\tYOLO Starting.....")
+        self.isStopped = False
         self.event_handler = EventHandler(withNCS)
         self.observer = watchdog.observers.Observer()
         self.handlerThread = Thread(target=self.run, name="YoloHandler")
