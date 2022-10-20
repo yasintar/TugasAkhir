@@ -69,6 +69,8 @@ class YOLO:
         self.net.setInput(blob)
 
     def isContinueProcess(self):
+        if self.timeout>=1 or self.timeout>=2:
+            return True
         if self.resumeTime is not None:
             now = datetime.now()
             diff = now - self.resumeTime
@@ -78,8 +80,9 @@ class YOLO:
         return False
 
     def setTimeoutYOLO(self, num):
-        self.resumeTime = datetime.now()
-        self.timeout = num
+        if self.resumeTime is None:
+            self.resumeTime = datetime.now()
+            self.timeout = num
 
 class EventHandler(watchdog.events.PatternMatchingEventHandler):
     def __init__(self, withNCS):
