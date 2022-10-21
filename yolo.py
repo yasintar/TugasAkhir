@@ -69,7 +69,8 @@ class YOLO:
         image = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
         input_blob = next(iter(self.net.inputs))
         output = self.net.infer({input_blob: image})
-        print(output)
+        print("Detect with NCS"+output)
+        return 0
 
     def confiAvg(self, confidences):
         if len(confidences) != 0:
@@ -107,7 +108,11 @@ class EventHandler(watchdog.events.PatternMatchingEventHandler):
   
     def on_created(self, event):
         time.sleep(TIMESLEEPTHREAD)
-        result = self.yoloDetector.detect("./"+str(event.src_path[2:]))
+        result = None
+        if not self.withNCS:
+            result = self.yoloDetector.detect("./"+str(event.src_path[2:]))
+        else:
+            result = self.yoloDetector.detectWithNCS("./"+str(event.src_path[2:]))
         self.setYoloResult(result)
         print("[]\tYOLO Res in "+str(event.src_path[2:])+" : ", self.getYoloResult())
 
@@ -161,5 +166,5 @@ if __name__=="__main__":
     # detector = YoloHandler()
     # detector.start()
 
-    detector = YOLO(False)
+    detector = YOLO(True)
     print(detector.detect("./image/coba.jpg"))
