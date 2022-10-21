@@ -18,7 +18,7 @@ class YOLO:
         self.resumeTime = None
         self.withNCS = withNCS
         if self.withNCS: 
-            from openvino.inference_engine import IECore, IENetwork
+            import openvino.inference_engine
             self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
             inferEngine = IECore()
             inferNet = IENetwork(model=cfg, weights=weight)
