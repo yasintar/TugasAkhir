@@ -65,8 +65,11 @@ class YOLO:
     def prepareImg(self, image):
         if not self.stream:
             image = cv.imread(image)
-        blob = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
-        self.net.setInput(blob)
+        if image is not None:
+            blob = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
+            self.net.setInput(blob)
+        else:
+            print('[]\tYOLO image not read correctly')
 
     def isContinueProcess(self):
         if self.resumeTime is not None:
