@@ -161,13 +161,13 @@ class AGS():
         if self.DiskThread is not None: self.DiskThread.join()
 
         CPUdf = pd.DataFrame(self.CPUData, columns=['Time', 'Time_Elapsed', 'CPU_Precentage'])
-        CPUdf.to_csv('CPU.csv', index=True)
+        CPUdf.to_csv('./dataLog/CPU.csv', index=True)
 
         RAMdf = pd.DataFrame(self.RAMData, columns=['Time', 'Time_Elapsed', 'RAM_Precentage'])
-        RAMdf.to_csv('RAM.csv', index=True)
+        RAMdf.to_csv('./dataLog/RAM.csv', index=True)
 
         Diskdf = pd.DataFrame(self.DiskData, columns=['Time', 'Time_Elapsed', 'Disk_Precentage'])
-        Diskdf.to_csv('Disk.csv', index=True)
+        Diskdf.to_csv('./dataLog/Disk.csv', index=True)
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":
