@@ -100,6 +100,7 @@ class AGS():
                 if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
                     if self.RAMWarning : self.RAMWarning = False
                     self.timeToCapture = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
+                    self.counterUpthRAM = self.counterUpthRAM + 1
                 elif self._ram >= FULL_RESOURCE:
                     self.RAMWarning = True
                 elif self._ram < CONST_RAM:
@@ -123,6 +124,7 @@ class AGS():
                 if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
                     if self.DiskWarning : self.DiskWarning = False
                     self.timeToCapture = 1 + (1 - (CONST_DISK/100)) * self.counterUpthDisk
+                    self.counterUpthDisk = self.counterUpthDisk + 1
                 elif self._disk >= FULL_RESOURCE:
                     self.DiskWarning = True
                 elif self._disk < CONST_DISK:
