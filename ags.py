@@ -100,6 +100,7 @@ class AGS():
                 if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
                     if self.RAMWarning : self.RAMWarning = False
                     self.timeToCapture = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
+                    self.counterUpthRAM = self.counterUpthRAM + 1
                 elif self._ram >= FULL_RESOURCE:
                     self.RAMWarning = True
                 elif self._ram < CONST_RAM:
@@ -123,6 +124,7 @@ class AGS():
                 if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
                     if self.DiskWarning : self.DiskWarning = False
                     self.timeToCapture = 1 + (1 - (CONST_DISK/100)) * self.counterUpthDisk
+                    self.counterUpthDisk = self.counterUpthDisk + 1
                 elif self._disk >= FULL_RESOURCE:
                     self.DiskWarning = True
                 elif self._disk < CONST_DISK:
@@ -159,13 +161,13 @@ class AGS():
         if self.DiskThread is not None: self.DiskThread.join()
 
         CPUdf = pd.DataFrame(self.CPUData, columns=['Time', 'Time_Elapsed', 'CPU_Precentage'])
-        CPUdf.to_csv('CPU.csv', index=True)
+        CPUdf.to_csv('./dataLog/CPU.csv', index=True)
 
         RAMdf = pd.DataFrame(self.RAMData, columns=['Time', 'Time_Elapsed', 'RAM_Precentage'])
-        RAMdf.to_csv('RAM.csv', index=True)
+        RAMdf.to_csv('./dataLog/RAM.csv', index=True)
 
         Diskdf = pd.DataFrame(self.DiskData, columns=['Time', 'Time_Elapsed', 'Disk_Precentage'])
-        Diskdf.to_csv('Disk.csv', index=True)
+        Diskdf.to_csv('./dataLog/Disk.csv', index=True)
         print("[]\tAGS Stopping .....")
 
 if __name__=="__main__":

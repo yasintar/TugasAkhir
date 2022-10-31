@@ -50,7 +50,7 @@ class YOLO:
                     'filename': [image],
                     'score': [avg]
                 })
-                analyzefile.to_csv('YOLODetectLog.csv', mode='a', index=False, header=False)
+                analyzefile.to_csv('./dataLog/YOLODetectLog.csv', mode='a', index=False, header=False)
                             
                 return avg
             except Exception as e:
