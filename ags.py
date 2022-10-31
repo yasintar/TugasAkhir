@@ -119,7 +119,7 @@ class AGS():
         DiskStartTime = time.time()
         while True:
             self._disk = psutil.disk_usage('/')[3]
-            if self._ram:
+            if self._disk:
                 DiskTemp = None
                 if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
                     if self.DiskWarning : self.DiskWarning = False
