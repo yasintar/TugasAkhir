@@ -46,10 +46,7 @@ class Relay:
         print("[]\tRelay Stopping.....")
 
     def appendYoloRes(self, res):
-        if res==2:
-            self._yoloRes.push(self.isTurnedOn)
-        else:
-            self._yoloRes.push(res)
+        self._yoloRes.push(res)
 
     def getYoloResList(self):
         return self._yoloRes.getList()
