@@ -42,19 +42,14 @@ class Main:
             while self.runable:
                 self.camera.stream()
 
-                self.camera.setTimeToCapture(self.ags.getTimeToCapture())
-                self.yolo.setAgsTimeout(self.ags.getTimeToProcess())
-
                 if self.ags.getCPUWarning():
-                    self.yolo.setAgsTimeout(10)
+                    print("[]\tAGS CPU Warning")
 
                 if self.ags.getRAMWarning():
-                    self.runable = False
+                    print("[]\tAGS CPU Warning")
 
                 if self.ags.getDiskWarning():
-                    DiskClearing = subprocess.run(["sudo", "sh", "freeSpace.sh"], stdout=subprocess.PIPE,stderr=subprocess.PIPE, text=True)
-                    print(DiskClearing.stdout)
-                    time.sleep(5)
+                    print("[]\tAGS CPU Warning")
 
                 if self.yolo.getYoloResult() is not None:
                     if self.yolo.getYoloResult()>0 and self.yolo.getYoloResult<2:

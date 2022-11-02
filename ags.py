@@ -3,7 +3,6 @@ from threading import Thread
 import time
 from datetime import datetime
 import pandas as pd
-from random import randint
 from constant import *
 
 class AGS():
@@ -25,13 +24,6 @@ class AGS():
         self.DiskWarning = False
 
         self.isWatchStopped = False
-
-        self.counterUpthCPU = 1
-        self.counterUpthRAM = 1
-        self.counterUpthDisk = 1
-        
-        self.timeToCapture = 1
-        self.timeToProcess = 1
 
         self._cpu = psutil.cpu_percent(0.1)
         self._ram = psutil.virtual_memory()[2]
@@ -73,15 +65,8 @@ class AGS():
             self._cpu = psutil.cpu_percent(0.1)
             if self._cpu:
                 CPUTemp = None
-                if self._cpu > CONST_CPU and self._cpu < FULL_RESOURCE:
-                    if self.CPUWarning : self.CPUWarning = False
-                    self.timeToProcess = randint(1,5)*self.counterUpthCPU
-                    self.counterUpthCPU = self.counterUpthCPU + 1
-                elif self._cpu >= FULL_RESOURCE:
+                if self._cpu >= FULL_RESOURCE:
                     self.CPUWarning = True
-                elif self._cpu < CONST_CPU:
-                    if self.CPUWarning : self.CPUWarning = False
-                    self.counterUpthCPU = 1
                 CPUTemp = [datetime.now().strftime("%H:%M:%S"), time.time()-CPUStartTime, self._cpu]
                 self.CPUData.append(CPUTemp)
 
@@ -97,15 +82,8 @@ class AGS():
             self._ram = psutil.virtual_memory()[2]
             if self._ram:
                 RAMTemp = None
-                if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
-                    if self.RAMWarning : self.RAMWarning = False
-                    self.timeToCapture = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
-                    self.counterUpthRAM = self.counterUpthRAM + 1
-                elif self._ram >= FULL_RESOURCE:
+                if self._ram >= FULL_RESOURCE:
                     self.RAMWarning = True
-                elif self._ram < CONST_RAM:
-                    self.counterUpthRAM = 1
-                    if self.RAMWarning : self.RAMWarning = False
                 RAMTemp = [datetime.now().strftime("%H:%M:%S"), time.time()-RAMStartTime, self._ram]
                 self.RAMData.append(RAMTemp)
 
@@ -121,15 +99,8 @@ class AGS():
             self._disk = psutil.disk_usage('/')[3]
             if self._disk:
                 DiskTemp = None
-                if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
-                    if self.DiskWarning : self.DiskWarning = False
-                    self.timeToCapture = 1 + (1 - (CONST_DISK/100)) * self.counterUpthDisk
-                    self.counterUpthDisk = self.counterUpthDisk + 1
-                elif self._disk >= FULL_RESOURCE:
+                if self._disk >= FULL_RESOURCE:
                     self.DiskWarning = True
-                elif self._disk < CONST_DISK:
-                    self.counterUpthDisk = 1
-                    if self.DiskWarning : self.DiskWarning = False
                 DiskTemp = [datetime.now().strftime("%H:%M:%S"), time.time()-DiskStartTime, self._disk]
                 self.DiskData.append(DiskTemp)
 
