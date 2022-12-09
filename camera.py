@@ -1,6 +1,7 @@
 import cv2 as cv
 from datetime import datetime
 from threading import Thread
+from queue import Queue
 import os
 import time
 
@@ -10,22 +11,23 @@ class Cam:
     def __init__(self, debug=True) -> None:
         self.isDebug = debug
         self.isStopped = False
+        self.q = Queue()
         if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
         else: 
             os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
             self.cap = cv.VideoCapture(DEVICESTGCAMERA, cv.CAP_FFMPEG)
         self.timeToCapture = None
-        self.frame = None
         self.name = None
         self.captureThread = Thread(target=self.capture, name="CAPTURE")
         print("[]\tCAMERA Starting.....")
 
     def stream(self):
-        ret, self.frame = self.cap.read()
+        ret, frame = self.cap.read()
         if not ret:
             print('[]\t(CAMERA) Camera Module not detected')
-        else: 
-            if self.isDebug: cv.imshow('Stream', self.frame)
+        else:
+            self.q.put(frame) 
+            # if self.isDebug: cv.imshow('Stream', frame)
 
         c = cv.waitKey(5)
         if c == 27:
@@ -47,6 +49,7 @@ class Cam:
         if t == 0:
             self.timeToCapture = TIME
         else:
+            print("[]\t CAMERA capturing image delay for {} s".format(t))
             self.timeToCapture = t
 
     def getTimeToCapture(self):
@@ -60,12 +63,10 @@ class Cam:
             while True:
                 now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
                 self.name = "./image/{}.png".format(now)
-                if self.frame is not None:
-                    if not cv.imwrite(filename=self.name, img=self.frame):
+                if self.q.empty() != True:
+                    if not cv.imwrite(filename=self.name, img=self.q.get()):
                         self.stop()
                         raise Exception('[]\t(CAMERA) Could not write image')
-                else:
-                    print("[]\t(CAMERA) Frame not detected yet")
                 
                 if self.isStopped:
                     break
@@ -73,7 +74,7 @@ class Cam:
                 time.sleep(self.timeToCapture)
 
 if __name__ == "__main__":
-    camera = Cam(False)
+    camera = Cam()
     while True:
         camera.stream()
         

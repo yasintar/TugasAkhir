@@ -75,7 +75,9 @@ class AGS():
                 CPUTemp = None
                 if self._cpu > CONST_CPU and self._cpu < FULL_RESOURCE:
                     if self.CPUWarning : self.CPUWarning = False
-                    self.timeToProcess = randint(1,5)*self.counterUpthCPU
+                    processDelay = randint(1,5)*self.counterUpthCPU
+                    if processDelay > 20: self.timeToProcess = 20
+                    else: self.timeToProcess = processDelay
                     self.counterUpthCPU = self.counterUpthCPU + 1
                 elif self._cpu >= FULL_RESOURCE:
                     self.CPUWarning = True
@@ -99,7 +101,9 @@ class AGS():
                 RAMTemp = None
                 if self._ram > CONST_RAM and self._ram < FULL_RESOURCE:
                     if self.RAMWarning : self.RAMWarning = False
-                    self.timeToCapture = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
+                    captureDelay = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
+                    if captureDelay > 6: self.timeToCapture = 6
+                    else: self.timeToCapture = captureDelay
                     self.counterUpthRAM = self.counterUpthRAM + 1
                 elif self._ram >= FULL_RESOURCE:
                     self.RAMWarning = True
@@ -121,11 +125,13 @@ class AGS():
             self._disk = psutil.disk_usage('/')[3]
             if self._disk:
                 DiskTemp = None
-                if self._disk > CONST_DISK and self._disk < FULL_RESOURCE:
+                if self._disk > CONST_DISK and self._disk < FULL_RESOURCE_DISK:
                     if self.DiskWarning : self.DiskWarning = False
-                    self.timeToCapture = 1 + (1 - (CONST_DISK/100)) * self.counterUpthDisk
+                    captureDelay = 1 + (1 - (CONST_RAM/100)) * self.counterUpthRAM
+                    if captureDelay > 6: self.timeToCapture = 6
+                    else: self.timeToCapture = captureDelay
                     self.counterUpthDisk = self.counterUpthDisk + 1
-                elif self._disk >= FULL_RESOURCE:
+                elif self._disk >= FULL_RESOURCE_DISK:
                     self.DiskWarning = True
                 elif self._disk < CONST_DISK:
                     self.counterUpthDisk = 1
