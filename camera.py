@@ -11,7 +11,7 @@ class Cam:
     def __init__(self, debug=True) -> None:
         self.isDebug = debug
         self.isStopped = False
-        self.q = Queue()
+        self.frame = None
         if debug: self.cap = cv.VideoCapture(DEVICEDEBUGCAMERA)
         else: 
             os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
@@ -22,12 +22,11 @@ class Cam:
         print("[]\tCAMERA Starting.....")
 
     def stream(self):
-        ret, frame = self.cap.read()
+        ret, self.frame = self.cap.read()
         if not ret:
             print('[]\t(CAMERA) Camera Module not detected')
         else:
-            self.q.put(frame) 
-            # if self.isDebug: cv.imshow('Stream', frame)
+            if self.isDebug: cv.imshow('Stream', self.frame)
 
         c = cv.waitKey(5)
         if c == 27:
@@ -63,8 +62,8 @@ class Cam:
             while True:
                 now = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
                 self.name = "./image/{}.png".format(now)
-                if self.q.empty() != True:
-                    if not cv.imwrite(filename=self.name, img=self.q.get()):
+                if self.frame is not None:
+                    if not cv.imwrite(filename=self.name, img=self.frame):
                         self.stop()
                         raise Exception('[]\t(CAMERA) Could not write image')
                 
