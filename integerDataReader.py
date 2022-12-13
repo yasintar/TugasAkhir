@@ -41,8 +41,8 @@ class Creator:
     def create(self):
         nums = []
         fopen = open("num.txt", "a")
-        for _ in range(0,1000000):
-            fopen.write(str(randint(0,100))+"\n")
+        for _ in range(0,86400):
+            fopen.write(str(randint(24,34))+"\n")
     
 if __name__=="__main__":
     # creator = Creator()
