@@ -30,7 +30,10 @@ class Main:
         try:
             while self.runable:
                 if self.relay is not None:
-                    self.relay.appendYoloRes(self.dataReader.getNum())
+                    if (int(self.dataReader.getNum())%3) == 1:
+                        self.relay.appendYoloRes(True)
+                    else:
+                        self.relay.appendYoloRes(False)
 
                 time.sleep(TIMESLEEPTHREAD)
 
