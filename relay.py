@@ -1,12 +1,12 @@
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 import time
 from threading import Thread
 from constant import *
 
 class Relay:
     def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(RELAIS_1_GPIO, GPIO.OUT)
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(RELAIS_1_GPIO, GPIO.OUT)
         self._yoloRes = tinyList()
         self.isStopped = False
         self.isTurnedOn = False
@@ -14,11 +14,11 @@ class Relay:
 
     def turnOnRelay(self):
         self.isTurnedOn = True
-        GPIO.output(RELAIS_1_GPIO, GPIO.HIGH)
+        # GPIO.output(RELAIS_1_GPIO, GPIO.HIGH)
 
     def turnOffRelay(self):
         self.isTurnedOn = False
-        GPIO.output(RELAIS_1_GPIO, GPIO.LOW)
+        # GPIO.output(RELAIS_1_GPIO, GPIO.LOW)
 
     def run(self):
         print("[]\RELAY Starting.....")
@@ -41,7 +41,7 @@ class Relay:
     def stop(self):
         self.isStopped = True
         time.sleep(TIMESLEEPTHREAD)
-        GPIO.cleanup()
+        # GPIO.cleanup()
         self.relayRun.join()
         print("[]\tRelay Stopping.....")
 

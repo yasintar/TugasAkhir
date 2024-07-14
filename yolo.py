@@ -1,5 +1,7 @@
 from threading import Thread
 from datetime import datetime
+
+import torch.hub
 import watchdog.events
 import watchdog.observers
 import pandas as pd
@@ -16,8 +18,10 @@ class YOLO:
         self.result = 0
         self.timeout = None
         self.resumeTime = None
-        self.net = cv.dnn.readNet(weight,cfg)
-        if withNCS: self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
+        self.net = torch.hub.load('WongKinYiu/yolov7', 'custom', 'model/yolov7-tiny.pt', trust_repo=True, force_reload=False)
+        self.net.conf = YOLO_CONFI
+        self.net.eval()
+       # if withNCS: self.net.setPreferableTarget(cv.dnn.DNN_TARGET_MYRIAD)
 
     def detect(self, image):
         if not self.isContinueProcess():
@@ -27,28 +31,26 @@ class YOLO:
             self.resumeTime = None
             try:
                 self.prepareImg(image=image)
-                layer_names = self.net.getLayerNames()
-                output_layers = [layer_names[i - 1] for i in self.net.getUnconnectedOutLayers()]
-
-                confidences = []
-                class_ids = []
-                outs = self.net.forward(output_layers)
-                for out in outs:
-                    for detection in out:
-                        scores = detection[5:]
-                        class_id = np.argmax(scores)
-                        confidence = scores[class_id]
-
-                        if confidence > YOLO_CONFI:
-                            class_ids.append(class_id)
-                            confidences.append(confidence)
-
+                outs = self.net(image, size=416)
+                #print(image)
+            
+                #outs.print()
+                result = outs.pandas().xyxy[0]
+                #print(result)
+                confidences = result['confidence'].values.tolist()
+                class_ids = result['class'].values.tolist()
+                #print(confidences)
+                #print(class_ids)
+                
+                #print("lewat 1")
                 avg = self.confiAvg(confidences)
-
+                
+                #print("lewat 2")
                 analyzefile = pd.DataFrame({
                     'timeProcessed': [datetime.now().strftime("%d-%m-%Y_%H:%M:%S")],
                     'filename': [image],
-                    'score': [avg]
+                    'score': [avg],
+                    'detect': [len(class_ids)]
                 })
                 analyzefile.to_csv('./dataLog/YOLODetectLog.csv', mode='a', index=False, header=False)
                             
@@ -65,10 +67,7 @@ class YOLO:
     def prepareImg(self, image):
         if not self.stream:
             image = cv.imread(image)
-        if image is not None:
-            blob = cv.dnn.blobFromImage(image, YOLO_SCALE, YOLO_IMGSIZE, (0,0,0), True, crop=False)
-            self.net.setInput(blob)
-        else:
+        if image is None:
             print('[]\tYOLO image not read correctly')
 
     def isContinueProcess(self):
@@ -90,7 +89,7 @@ class EventHandler(watchdog.events.PatternMatchingEventHandler):
     def __init__(self, withNCS):
         self.yoloDetector = YOLO(withNCS)
         self.yoloRes = None
-        watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.png'],
+        watchdog.events.PatternMatchingEventHandler.__init__(self, patterns=['*.jpg'],
                                                              ignore_directories=True, case_sensitive=False)
   
     def on_created(self, event):
@@ -112,18 +111,22 @@ class YoloHandler(watchdog.observers.Observer):
     def __init__(self, withNCS):
         print("[]\tYOLO Starting.....")
         self.isStopped = False
+        self.timeoutWatchdog = 0
         self.event_handler = EventHandler(withNCS)
         self.observer = watchdog.observers.Observer()
         self.handlerThread = Thread(target=self.run, name="YoloHandler")
 
     def setAgsTimeout(self, num):
         self.event_handler.setTimeoutYOLO(num)
+        self.timeoutWatchdog = num
 
     def run(self):
         self.observer.schedule(self.event_handler, path=IMG_PATH, recursive=True)
         self.observer.start()
         try:
             while True:
+                if self.timeoutWatchdog != 0:
+                    time.sleep(self.timeoutWatchdog/2)
                 if self.isStopped:
                     break
                 time.sleep(TIMESLEEPTHREAD)
